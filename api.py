@@ -61,9 +61,13 @@ def analyze_stock(ticker: str):
         "intraday": intra_data
     }
 
+@app.api_route("/health", methods=["GET", "HEAD"])
+def health_check():
+    return {"status": "ok"}
+
 app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 
-@app.get("/{full_path:path}")
+@app.api_route("/{full_path:path}", methods=["GET", "HEAD"])
 def catch_all(full_path: str):
     file_path = os.path.join(frontend_path, full_path)
     if os.path.exists(file_path) and os.path.isfile(file_path):
