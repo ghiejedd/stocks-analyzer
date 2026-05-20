@@ -124,6 +124,218 @@ def get_fundamental(saham, kode):
             except Exception:
                 pass
 
+        # Discounted Cash Flow (DCF) Valuation using CAPM Cost of Equity
+        dcf_val = "N/A"
+        dcf_diff = "N/A"
+        dcf_status = "N/A"
+        dcf_params = "N/A"
+        try:
+            if price and mcap:
+                # 1. Cost of Equity (CAPM)
+                rf = 0.065  # 6.5% Risk-free Rate (ID 10Y Bond Yield)
+                mrp = 0.055  # 5.5% Market Risk Premium
+                b_val = beta if (beta and not pd.isna(beta)) else 1.0
+                r = rf + b_val * mrp
+                r = max(0.08, min(0.18, r))  # Bound Ke between 8% and 18%
+                
+                # 2. Growth Rate (g)
+                rev_g = rev_growth if (rev_growth and not pd.isna(rev_growth)) else 0.08
+                earn_g = earn_growth if (earn_growth and not pd.isna(earn_growth)) else 0.08
+                g = max(rev_g, earn_g) if (rev_g and earn_g) else 0.08
+                g = max(0.04, min(0.15, g))  # Bound g between 4% and 15%
+                
+                # 3. Base Cash Flow (CF0)
+                cf0 = None
+                if fcf and fcf > 0:
+                    cf0 = fcf
+                elif ocf and ocf > 0:
+                    cf0 = ocf * 0.7  # CapEx adjusted proxy
+                elif ni and ni > 0:
+                    cf0 = ni
+                elif eps and eps > 0:
+                    shares_est = mcap / price
+                    cf0 = eps * shares_est
+                
+                if cf0:
+                    shares = mcap / price
+                    
+                    # Year 1-5 PV projections
+                    pv_sum = 0
+                    cf_t = cf0
+                    for t in range(1, 6):
+                        cf_t = cf_t * (1 + g)
+                        pv_t = cf_t / ((1 + r) ** t)
+                        pv_sum += pv_t
+                    
+                    # Terminal Value
+                    gn = 0.03  # 3% Long-term growth
+                    if r > gn:
+                        tv = cf_t * (1 + gn) / (r - gn)
+                        pv_tv = tv / ((1 + r) ** 5)
+                        
+                        total_val = pv_sum + pv_tv
+                        dcf_num = total_val / shares
+                        dcf_num = round(dcf_num, 0)
+                        
+                        dcf_val = f"Rp {dcf_num:,.0f}"
+                        diff_pct = ((dcf_num - price) / price) * 100
+                        dcf_diff = f"{diff_pct:+.2f}%"
+                        dcf_status = "UNDERVALUED (Murah)" if price < dcf_num else "OVERVALUED (Mahal)"
+                        dcf_params = f"WACC/Ke: {r*100:.1f}%, Growth: {g*100:.1f}%"
+        except Exception:
+            pass
+
+        # Piotroski F-Score (Smart Adaptation)
+        f_score = 0
+        f_details = []
+        try:
+            # 1. Positive ROA
+            roa_val = safe_get(info, 'returnOnAssets')
+            if roa_val and roa_val > 0:
+                f_score += 1
+                f_details.append("ROA Positif (+1)")
+            else:
+                f_details.append("ROA Negatif/Rendah (+0)")
+            
+            # 2. Positive Operating Cash Flow
+            ocf_val = safe_get(info, 'operatingCashflow')
+            if ocf_val and ocf_val > 0:
+                f_score += 1
+                f_details.append("OCF Positif (+1)")
+            else:
+                f_details.append("OCF Negatif (+0)")
+            
+            # 3. Quality of Earnings (OCF > Net Income)
+            ni_val = safe_get(info, 'netIncomeToCommon')
+            if ocf_val and ni_val and ocf_val > ni_val:
+                f_score += 1
+                f_details.append("Kualitas Laba Sehat (OCF > Net Income) (+1)")
+            else:
+                f_details.append("Kualitas Laba Rendah (Net Income > OCF) (+0)")
+            
+            # 4. Profitability Strength (ROA > 5%)
+            if roa_val and roa_val > 0.05:
+                f_score += 1
+                f_details.append("ROA Kuat (>5%) (+1)")
+            else:
+                f_details.append("ROA Lemah (<5%) (+0)")
+                
+            # 5. Liquid Current Ratio (>1.5x)
+            cr_val = safe_get(info, 'currentRatio')
+            if cr_val and cr_val > 1.5:
+                f_score += 1
+                f_details.append("Current Ratio Aman (>1.5x) (+1)")
+            else:
+                f_details.append("Current Ratio Rendah (<1.5x) (+0)")
+                
+            # 6. Lower Debt-to-Equity (DER < 100%)
+            der_val = safe_get(info, 'debtToEquity')
+            if der_val and der_val < 100:
+                f_score += 1
+                f_details.append("DER Rendah (<100%) (+1)")
+            else:
+                f_details.append("DER Tinggi (>=100%) (+0)")
+                
+            # 7. Positive Revenue Growth
+            rev_g = safe_get(info, 'revenueGrowth')
+            if rev_g and rev_g > 0.05:
+                f_score += 1
+                f_details.append("Pertumbuhan Revenue Sehat (>5%) (+1)")
+            else:
+                f_details.append("Pertumbuhan Revenue Lambat (+0)")
+                
+            # 8. High Gross Margin (>25%)
+            gpm_val = safe_get(info, 'grossMargins')
+            if gpm_val and gpm_val > 0.25:
+                f_score += 1
+                f_details.append("Gross Margin Kuat (>25%) (+1)")
+            else:
+                f_details.append("Gross Margin Tipis (<25%) (+0)")
+                
+            # 9. Positive Earnings Growth
+            earn_g = safe_get(info, 'earningsGrowth')
+            if earn_g and earn_g > 0:
+                f_score += 1
+                f_details.append("Pertumbuhan Laba Positif (+1)")
+            else:
+                f_details.append("Pertumbuhan Laba Lambat/Negatif (+0)")
+        except Exception:
+            pass
+
+        # Altman Z-Score (Emerging Market & Standard Corporate Model)
+        z_score = 0.0
+        z_status = "Distress Zone (Sangat Berisiko)"
+        try:
+            if price and mcap:
+                td = safe_get(info, 'totalDebt') or 0
+                bv_val = safe_get(info, 'bookValue')
+                shares = mcap / price
+                equity = (shares * bv_val) if (shares and bv_val) else mcap
+                ta = equity + td
+                
+                if ta > 0:
+                    # X1: Working Capital / Total Assets
+                    cr_val = safe_get(info, 'currentRatio')
+                    if cr_val and cr_val > 0:
+                        cl = td * 0.5 if td > 0 else ta * 0.1
+                        cl = max(cl, 1.0)
+                        ca = cr_val * cl
+                        wc = ca - cl
+                        x1 = wc / ta
+                    else:
+                        x1 = 0.15
+                    
+                    # X2: Retained Earnings / Total Assets
+                    roe_val = safe_get(info, 'returnOnEquity') or 0.1
+                    x2 = (roe_val * equity) / ta
+                    
+                    # X3: EBIT / Total Assets
+                    roa_val = safe_get(info, 'returnOnAssets') or 0.05
+                    x3 = roa_val
+                    
+                    # X4: Market Equity / Total Liabilities (Total Debt)
+                    x4 = mcap / td if td > 0 else 5.0
+                    
+                    # X5: Revenue / Total Assets
+                    rev_val = safe_get(info, 'totalRevenue')
+                    x5 = rev_val / ta if (rev_val and ta) else 0.7
+                    
+                    # Z-Score Formula
+                    z_score = (1.2 * x1) + (1.4 * x2) + (3.3 * x3) + (0.6 * x4) + (0.99 * x5)
+                    z_score = max(0.0, min(15.0, z_score))
+                else:
+                    # Simple fallback
+                    cr_val = safe_get(info, 'currentRatio') or 1.0
+                    roa_val = safe_get(info, 'returnOnAssets') or 0.05
+                    der_val = safe_get(info, 'debtToEquity') or 100.0
+                    z_score = (0.5 * min(2.0, cr_val)) + (10.0 * roa_val) + (100.0 / max(10.0, der_val))
+                    z_score = max(0.0, min(15.0, z_score))
+                
+                if z_score > 2.99:
+                    z_status = "Safe Zone (Sangat Sehat)"
+                elif z_score >= 1.81:
+                    z_status = "Gray Zone (Risiko Sedang)"
+                else:
+                    z_status = "Distress Zone (Sangat Berisiko)"
+        except Exception:
+            z_score = 1.9
+            z_status = "Gray Zone (Risiko Sedang)"
+
+        # Adjust fundamental score slightly
+        if f_score >= 7:
+            skor += 1
+            alasan.append(f"Piotroski F-Score Sangat Kuat ({f_score}/9)")
+        elif f_score <= 3:
+            skor -= 1
+            alasan.append(f"Piotroski F-Score Lemah ({f_score}/9)")
+
+        if z_status.startswith("Safe"):
+            skor += 1
+            alasan.append("Altman Z-Score: Finansial aman (Safe Zone)")
+        elif z_status.startswith("Distress"):
+            skor -= 1
+            alasan.append("Altman Z-Score: Risiko keuangan tinggi (Distress Zone)")
+
         return {
             "skor": skor,
             "alasan": alasan,
@@ -137,7 +349,15 @@ def get_fundamental(saham, kode):
                 "ev_rev": f"{ev_rev:.2f}x" if ev_rev else "N/A",
                 "graham_val": graham_val,
                 "graham_diff": graham_diff,
-                "graham_status": graham_status
+                "graham_status": graham_status,
+                "dcf_val": dcf_val,
+                "dcf_diff": dcf_diff,
+                "dcf_status": dcf_status,
+                "dcf_params": dcf_params,
+                "piotroski_val": f"{f_score}/9",
+                "piotroski_details": f_details,
+                "altman_val": f"{z_score:.2f}",
+                "altman_status": z_status
             },
             "profitabilitas": {
                 "roe": f"{roe*100:.2f}%" if roe else "N/A",

@@ -126,18 +126,55 @@
                             </div>
                         </div>
                         
-                        <!-- Graham Number Fair Value Box -->
-                        <div class="graham-box glass" id="graham-valuation-box">
-                            <h4>Estimasi Harga Wajar (Graham Number)</h4>
-                            <div class="graham-row">
-                                <span>Graham Fair Value:</span>
-                                <strong id="graham-val">-</strong>
+                        <!-- Premium Valuation & Financial Health Models -->
+                        <div class="graham-box glass" id="graham-valuation-box" style="margin-top: 15px;">
+                            <h4 style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; margin-bottom: 12px; color: var(--accent-yellow); font-family: 'Outfit', sans-serif; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px;">Valuasi Premium & Kesehatan Finansial</h4>
+                            
+                            <!-- DCF Valuasi -->
+                            <div class="valuation-sub-box" style="margin-bottom: 12px;">
+                                <h5 style="margin: 0 0 6px 0; color: #fff; font-size: 13px; font-weight: 600;">Discounted Cash Flow (DCF) - Intrinsic Value</h5>
+                                <div class="graham-row">
+                                    <span>DCF Fair Value:</span>
+                                    <strong id="dcf-val">-</strong>
+                                </div>
+                                <div class="graham-row">
+                                    <span>Margin of Safety:</span>
+                                    <strong id="dcf-diff">-</strong>
+                                </div>
+                                <div class="graham-status" id="dcf-status">-</div>
+                                <div class="graham-row" style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">
+                                    <span>Parameter Model:</span>
+                                    <span id="dcf-params" style="font-family: monospace;">-</span>
+                                </div>
                             </div>
-                            <div class="graham-row">
-                                <span>Deviasi Harga:</span>
-                                <strong id="graham-diff">-</strong>
+                            
+                            <!-- Graham Number Valuasi -->
+                            <div class="valuation-sub-box" style="margin-bottom: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+                                <h5 style="margin: 0 0 6px 0; color: #fff; font-size: 13px; font-weight: 600;">Graham Number (Benjamin Graham Value)</h5>
+                                <div class="graham-row">
+                                    <span>Graham Fair Value:</span>
+                                    <strong id="graham-val">-</strong>
+                                </div>
+                                <div class="graham-row">
+                                    <span>Deviasi Harga:</span>
+                                    <strong id="graham-diff">-</strong>
+                                </div>
+                                <div class="graham-status" id="graham-status">-</div>
                             </div>
-                            <div class="graham-status" id="graham-status">-</div>
+                            
+                            <!-- Piotroski F-Score & Altman Z-Score -->
+                            <div class="valuation-sub-box" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+                                <h5 style="margin: 0 0 6px 0; color: #fff; font-size: 13px; font-weight: 600;">Kesehatan Finansial & Risiko Kebangkrutan</h5>
+                                <div class="graham-row">
+                                    <span>Piotroski F-Score:</span>
+                                    <strong id="piotroski-val">-</strong>
+                                </div>
+                                <div class="graham-row">
+                                    <span>Altman Z-Score:</span>
+                                    <strong id="altman-val">-</strong>
+                                </div>
+                                <div class="graham-status" id="altman-status" style="font-size: 11px; font-weight: bold; margin-top: 4px; text-transform: uppercase;">-</div>
+                            </div>
                         </div>
                     </div>
                 </div>

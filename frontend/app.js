@@ -310,25 +310,74 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="metric-item"><span class="metric-label">Payout Ratio</span><span class="metric-value">${data.market_info.payout}</span></div>
         `;
 
+        // DCF Valuation Box
+        const dcfVal = data.valuasi.dcf_val;
+        const dcfDiff = data.valuasi.dcf_diff;
+        const dcfStatus = data.valuasi.dcf_status;
+        const dcfParams = data.valuasi.dcf_params;
+
+        document.getElementById('dcf-val').textContent = dcfVal;
+        
+        const dcfDiffEl = document.getElementById('dcf-diff');
+        dcfDiffEl.textContent = dcfDiff;
+        if (dcfDiff && dcfDiff.startsWith('+')) {
+            dcfDiffEl.className = 'text-green';
+        } else if (dcfDiff && dcfDiff.startsWith('-')) {
+            dcfDiffEl.className = 'text-red';
+        } else {
+            dcfDiffEl.className = '';
+        }
+
+        const dcfStatusEl = document.getElementById('dcf-status');
+        dcfStatusEl.textContent = dcfStatus;
+        if (dcfStatus && dcfStatus.includes('UNDERVALUED')) {
+            dcfStatusEl.style.color = 'var(--accent-green)';
+        } else if (dcfStatus && dcfStatus.includes('OVERVALUED')) {
+            dcfStatusEl.style.color = 'var(--accent-red)';
+        } else {
+            dcfStatusEl.style.color = 'var(--text-secondary)';
+        }
+        document.getElementById('dcf-params').textContent = dcfParams;
+
         // Graham Valuation Box
         const gVal = data.valuasi.graham_val;
         const gDiff = data.valuasi.graham_diff;
         const gStatus = data.valuasi.graham_status;
 
         document.getElementById('graham-val').textContent = gVal;
-        document.getElementById('graham-diff').textContent = gDiff;
+        
+        const gDiffEl = document.getElementById('graham-diff');
+        gDiffEl.textContent = gDiff;
+        if (gDiff && gDiff.startsWith('+')) {
+            gDiffEl.className = 'text-green';
+        } else if (gDiff && gDiff.startsWith('-')) {
+            gDiffEl.className = 'text-red';
+        } else {
+            gDiffEl.className = '';
+        }
         
         const gStatusEl = document.getElementById('graham-status');
         gStatusEl.textContent = gStatus;
-        if (gStatus.includes('UNDERVALUED')) {
+        if (gStatus && gStatus.includes('UNDERVALUED')) {
             gStatusEl.style.color = 'var(--accent-green)';
-            document.getElementById('graham-diff').className = 'text-green';
-        } else if (gStatus.includes('OVERVALUED')) {
+        } else if (gStatus && gStatus.includes('OVERVALUED')) {
             gStatusEl.style.color = 'var(--accent-red)';
-            document.getElementById('graham-diff').className = 'text-red';
         } else {
             gStatusEl.style.color = 'var(--text-secondary)';
-            document.getElementById('graham-diff').className = '';
+        }
+
+        // Piotroski F-Score & Altman Z-Score Box
+        document.getElementById('piotroski-val').textContent = data.valuasi.piotroski_val;
+        document.getElementById('altman-val').textContent = data.valuasi.altman_val;
+        
+        const altmanStatusEl = document.getElementById('altman-status');
+        altmanStatusEl.textContent = data.valuasi.altman_status;
+        if (data.valuasi.altman_status && data.valuasi.altman_status.includes('Safe')) {
+            altmanStatusEl.style.color = 'var(--accent-green)';
+        } else if (data.valuasi.altman_status && data.valuasi.altman_status.includes('Distress')) {
+            altmanStatusEl.style.color = 'var(--accent-red)';
+        } else {
+            altmanStatusEl.style.color = 'var(--accent-yellow)';
         }
     }
 
