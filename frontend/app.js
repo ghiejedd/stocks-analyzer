@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loader = document.getElementById('loader');
     const errorContainer = document.getElementById('error-message');
     const errorText = document.getElementById('error-text');
+    const welcomeHero = document.getElementById('welcome-hero');
 
     let liveTickerInterval = null;
 
@@ -17,8 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const ticker = searchInput.value.trim();
         if (!ticker) return;
 
-        // Reset UI & Stop previous ticker
+        // Reset UI & Stop previous ticker & Hide welcome landing
         if (liveTickerInterval) clearInterval(liveTickerInterval);
+        welcomeHero.style.display = 'none';
         
         dashboard.classList.remove('active');
         setTimeout(() => {
@@ -53,6 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
             errorContainer.style.display = 'flex';
         }
     }
+
+    // Expose quick search globally for welcome screen popular stocks suggestion buttons
+    window.quickSearch = (ticker) => {
+        searchInput.value = ticker;
+        performSearch();
+    };
 
     function renderDashboard(data) {
         // --- 1. Company Profile Header & Logo ---

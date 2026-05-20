@@ -19,14 +19,40 @@
         <!-- Header -->
         <header class="header glass" id="app-header">
             <div class="logo" id="app-logo-area">
-                <h1>Stocks Analyzer</h1>
-                <span class="brand-subtitle">by Ziendraa</span>
+                <img src="/static/stocks_logo.png" alt="Logo" class="app-logo-img">
+                <div class="logo-text">
+                    <h1>Stocks Analyzer</h1>
+                    <span class="brand-subtitle">by Ziendraa</span>
+                </div>
             </div>
             <div class="search-bar" id="search-container">
                 <input type="text" id="ticker-input" placeholder="Masukkan Kode Saham (contoh: BBCA)" autocomplete="off">
                 <button id="analyze-btn" class="btn-primary">Analisa</button>
             </div>
         </header>
+
+        <!-- Welcome Hero Landing Page -->
+        <section class="welcome-hero glass" id="welcome-hero">
+            <div class="hero-content">
+                <h2 class="hero-title">Analisa Saham IDX dengan Standar Institusi Premium</h2>
+                <p class="hero-desc">
+                    Selamat datang di <strong>Stocks Analyzer</strong>. Sistem analisis multi-dimensi modern yang memadukan perhitungan valuasi intrinsik premium (DCF, Graham Number) dengan model kesehatan finansial (Altman Z-Score, Piotroski F-Score) serta indikator teknikal komprehensif secara real-time.
+                </p>
+                <div class="quick-tips">
+                    <span class="tip-label">Coba Cari Saham Populer:</span>
+                    <div class="tip-buttons">
+                        <button class="tip-btn" onclick="quickSearch('BBCA')">BBCA</button>
+                        <button class="tip-btn" onclick="quickSearch('BBRI')">BBRI</button>
+                        <button class="tip-btn" onclick="quickSearch('TLKM')">TLKM</button>
+                        <button class="tip-btn" onclick="quickSearch('ASII')">ASII</button>
+                        <button class="tip-btn" onclick="quickSearch('ADRO')">ADRO</button>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image-container">
+                <img src="/static/finance_hero.png" alt="Fintech Analytics Hero" class="hero-illustration">
+            </div>
+        </section>
 
         <!-- Main Dashboard -->
         <main class="dashboard" id="dashboard" style="display: none;">
