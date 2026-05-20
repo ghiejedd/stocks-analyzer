@@ -19,7 +19,6 @@
         <!-- Header -->
         <header class="header glass" id="app-header">
             <div class="logo" id="app-logo-area">
-                <img src="/static/stocks_logo.png" alt="Logo" class="app-logo-img">
                 <div class="logo-text">
                     <h1>Stocks Analyzer</h1>
                     <span class="brand-subtitle">by Ziendraa</span>
@@ -50,7 +49,49 @@
                 </div>
             </div>
             <div class="hero-image-container">
-                <img src="/static/finance_hero.png" alt="Fintech Analytics Hero" class="hero-illustration">
+                <div class="carousel-container">
+                    <div class="carousel-slides">
+                        <!-- Slide 1: Welcome Illustration -->
+                        <div class="carousel-slide active">
+                            <img src="/static/finance_hero.png" alt="Fintech Analytics Hero" class="hero-illustration">
+                            <div class="slide-caption">Stocks Analyzer Platform</div>
+                        </div>
+                        <!-- Slide 2: Premium Valuation -->
+                        <div class="carousel-slide">
+                            <div class="slide-glass-card">
+                                <div class="slide-card-icon">💎</div>
+                                <h3>Valuasi Premium</h3>
+                                <p>Menghitung nilai wajar intrinsik saham secara presisi dengan Model <strong>Discounted Cash Flow (DCF)</strong> & <strong>Graham Number</strong> lengkap dengan Margin of Safety real-time.</p>
+                                <div class="slide-card-badge text-yellow">Institutional Grade</div>
+                            </div>
+                        </div>
+                        <!-- Slide 3: Financial Health -->
+                        <div class="carousel-slide">
+                            <div class="slide-glass-card">
+                                <div class="slide-card-icon">🛡️</div>
+                                <h3>Kesehatan Finansial</h3>
+                                <p>Mendeteksi dini risiko kebangkrutan emiten menggunakan skor komprehensif <strong>Altman Z-Score</strong> (Safe, Gray, Distress Zone) dan <strong>Piotroski F-Score</strong> (0-9).</p>
+                                <div class="slide-card-badge text-green">Credit Scoring</div>
+                            </div>
+                        </div>
+                        <!-- Slide 4: Modern Technicals -->
+                        <div class="carousel-slide">
+                            <div class="slide-glass-card">
+                                <div class="slide-card-icon">⚡</div>
+                                <h3>Teknikal Modern</h3>
+                                <p>Sinyal tren multi-timeframe terintegrasi dengan rerata bergerak (EMA/MA), momentum osilator (RSI, MACD, Stoch), <strong>Ichimoku Cloud</strong>, dan deteksi pola <strong>Candlestick</strong> otomatis.</p>
+                                <div class="slide-card-badge text-blue">Advanced Trading</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Navigation Dots -->
+                    <div class="carousel-dots">
+                        <span class="dot active" onclick="setSlide(0)"></span>
+                        <span class="dot" onclick="setSlide(1)"></span>
+                        <span class="dot" onclick="setSlide(2)"></span>
+                        <span class="dot" onclick="setSlide(3)"></span>
+                    </div>
+                </div>
             </div>
         </section>
 

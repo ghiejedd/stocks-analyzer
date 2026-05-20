@@ -62,6 +62,44 @@ document.addEventListener('DOMContentLoaded', () => {
         performSearch();
     };
 
+    // Welcome Screen Carousel Slideshow Logic
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.dot');
+    let slideInterval = null;
+
+    function showSlide(index) {
+        if (slides.length === 0) return;
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        currentSlide = (index + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active');
+        if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+    }
+
+    window.setSlide = (index) => {
+        showSlide(index);
+        resetSlideTimer();
+    };
+
+    function startSlideTimer() {
+        if (slides.length === 0) return;
+        slideInterval = setInterval(() => {
+            showSlide(currentSlide + 1);
+        }, 4500);
+    }
+
+    function resetSlideTimer() {
+        if (slideInterval) {
+            clearInterval(slideInterval);
+            startSlideTimer();
+        }
+    }
+
+    // Initialize slide timer
+    startSlideTimer();
+
     function renderDashboard(data) {
         // --- 1. Company Profile Header & Logo ---
         const profile = data.profile;
@@ -163,6 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.innerHTML = ''; // Reset container
         
         const logoFallbacks = [];
+        
+        // Priority 1: Stockbit's official high-res PNG company logos CDN for Indonesian Emitens
+        if (cleanTicker) {
+            logoFallbacks.push(`https://assets.stockbit.com/logos/companies/${cleanTicker.toUpperCase()}.png`);
+        }
+        
         if (logoHdUrl) logoFallbacks.push(logoHdUrl);
         if (logoUrl) logoFallbacks.push(logoUrl);
         if (domain) {
