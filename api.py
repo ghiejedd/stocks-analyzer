@@ -1,10 +1,42 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 import yfinance as yf
 import stock_engine
 import os
+import json
+import numpy as np
+import traceback
+
+# Custom JSON encoder that handles numpy types for all Python/numpy versions
+class NumpySafeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (np.integer,)):
+            return int(obj)
+        if isinstance(obj, (np.floating,)):
+            return float(obj)
+        if isinstance(obj, (np.bool_,)):
+            return bool(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
+
+def sanitize_for_json(obj):
+    """Recursively convert numpy types to native Python types."""
+    if isinstance(obj, dict):
+        return {k: sanitize_for_json(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [sanitize_for_json(v) for v in obj]
+    elif isinstance(obj, (np.integer,)):
+        return int(obj)
+    elif isinstance(obj, (np.floating,)):
+        return float(obj)
+    elif isinstance(obj, (np.bool_,)):
+        return bool(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    return obj
 
 app = FastAPI(title="Stock Analyzer API")
 
@@ -30,49 +62,74 @@ def analyze_stock(ticker: str):
         data = saham.history(period="6mo")
         
         if data.empty:
-            raise HTTPException(status_code=404, detail="Data saham tidak ditemukan.")
+            raise HTTPException(status_code=404, detail="Data saham tidak ditemukan. Pastikan kode saham valid (contoh: BBCA, TLKM).")
         
-        fund_data = stock_engine.get_fundamental(saham, ticker)
-        tek_data, data = stock_engine.get_teknikal(data, ticker)
-        sr_data = stock_engine.get_support_resistance(data, ticker)
-        orderbook_data = stock_engine.get_orderbook_analysis(data, ticker)
-        broker_data = stock_engine.get_broker_summary(data, ticker)
-        intra_data = stock_engine.get_intraday_strategy(data, ticker)
-        profile_data = stock_engine.get_company_profile(saham, ticker)
-        news_data = stock_engine.get_news(saham, ticker)
-        
+        # === Core Analysis (all wrapped for cloud resilience) ===
+        try:
+            fund_data = stock_engine.get_fundamental(saham, ticker)
+        except Exception as e:
+            fund_data = {"skor": 0, "alasan": [f"Error fundamental: {e}"], "valuasi": {}, "profitabilitas": {}, "laporan_keuangan": {}, "pertumbuhan": {}, "market_info": {"price": 0}}
+
+        try:
+            tek_data, data = stock_engine.get_teknikal(data, ticker)
+        except Exception as e:
+            tek_data = {"skor": 0, "change_pct": 0, "sinyal": f"Error: {e}"}
+
+        try:
+            sr_data = stock_engine.get_support_resistance(data, ticker)
+        except Exception as e:
+            sr_data = {"pivot": None, "s1": None, "s2": None, "s3": None, "r1": None, "r2": None, "r3": None}
+
+        try:
+            orderbook_data = stock_engine.get_orderbook_analysis(data, ticker)
+        except Exception as e:
+            orderbook_data = {"volume_profile": [], "high_volume_nodes": [], "current_price": 0, "poc": None, "value_area_high": None, "value_area_low": None, "total_volume": 0}
+
+        try:
+            broker_data = stock_engine.get_broker_summary(data, ticker)
+        except Exception as e:
+            broker_data = {"skor": 0, "sinyal": f"Error: {e}"}
+
+        try:
+            intra_data = stock_engine.get_intraday_strategy(data, ticker)
+        except Exception as e:
+            intra_data = {"strategy": f"Error: {e}"}
+
+        try:
+            profile_data = stock_engine.get_company_profile(saham, ticker)
+        except Exception as e:
+            clean = ticker.replace('.JK', '').upper()
+            profile_data = {"name": clean, "sector": "N/A", "industry": "N/A", "summary": "Gagal memuat profil.", "website": "N/A", "domain": "", "logo": f"https://ui-avatars.com/api/?name={clean}&background=0D8ABC&color=fff&size=256&bold=true", "logo_hd": ""}
+
+        try:
+            news_data = stock_engine.get_news(saham, ticker)
+        except Exception as e:
+            news_data = {"articles": [], "pos_count": 0, "neg_count": 0, "neu_count": 0, "average_score": 0, "sentiment_index": 0, "skor_news": 0, "source": "error"}
+
         # === Advanced Quant Models (Risk & Manipulation Filters Calculated First) ===
         try:
             uma_data = stock_engine.detect_uma_manipulation(data)
         except Exception as e:
             uma_data = {"detected": False, "probability": 0.0, "reasons": [str(e)]}
-    
+
         try:
             crash_momentum_data = stock_engine.get_crash_momentum_analysis(data, ticker)
         except Exception as e:
             crash_momentum_data = {
-                "skewness": 0.0,
-                "excess_kurtosis": 0.0,
-                "max_drawdown": 0.0,
-                "ex_ante_crash_probability": 0.0,
-                "volatility_ratio": 1.0,
-                "volume_spike_ratio": 1.0,
-                "rsi_current": 50.0,
-                "signal": "ERROR",
-                "instruction": f"Error: {str(e)}",
+                "skewness": 0.0, "excess_kurtosis": 0.0, "max_drawdown": 0.0,
+                "ex_ante_crash_probability": 0.0, "volatility_ratio": 1.0,
+                "volume_spike_ratio": 1.0, "rsi_current": 50.0,
+                "signal": "ERROR", "instruction": f"Error: {str(e)}",
                 "reasons": ["Gagal menghitung model Crash-Based Momentum."]
             }
-    
+
         skor_fund = fund_data.get('skor', 0)
         skor_tek = tek_data.get('skor', 0)
         skor_broker = broker_data.get('skor', 0)
         skor_news = news_data.get('skor_news', 0)
         
         total_skor, rekom = stock_engine.get_rekomendasi(
-            skor_fund, 
-            skor_tek, 
-            skor_broker, 
-            skor_news, 
+            skor_fund, skor_tek, skor_broker, skor_news, 
             uma_detected=uma_data.get('detected', False),
             crash_prob=crash_momentum_data.get('ex_ante_crash_probability', 0.0)
         )
@@ -85,57 +142,37 @@ def analyze_stock(ticker: str):
             pca_eva_data = stock_engine.get_pca_eva_score(info, mcap_raw, price_raw)
         except Exception as e:
             pca_eva_data = {
-                "score": 0.0,
-                "grade": f"Error: {str(e)}",
-                "color": "yellow",
-                "wacc": "N/A",
-                "eva_value": "N/A",
-                "nopat": "N/A",
-                "capital_employed": "N/A",
-                "contributions": {}
+                "score": 0.0, "grade": f"Error: {str(e)}", "color": "yellow",
+                "wacc": "N/A", "eva_value": "N/A", "nopat": "N/A",
+                "capital_employed": "N/A", "contributions": {}
             }
-    
+
         try:
             stat_arb_data = stock_engine.check_statistical_arbitrage(data['Close'], ticker)
         except Exception as e:
             stat_arb_data = {
-                "cointegrated": False,
-                "peer": "N/A",
-                "z_score": 0.0,
-                "label": 0,
-                "instruction": f"Error: {str(e)}",
-                "explanation": "Terjadi error dalam perhitungan.",
+                "cointegrated": False, "peer": "N/A", "z_score": 0.0, "label": 0,
+                "instruction": f"Error: {str(e)}", "explanation": "Terjadi error.",
                 "spread_history": []
             }
-    
+
         try:
             ou_data = stock_engine.estimate_ornstein_uhlenbeck(data['Close'])
         except Exception as e:
-            ou_data = {
-                "speed_a": 0.0,
-                "half_life_days": "N/A",
-                "status": f"Error: {str(e)}"
-            }
+            ou_data = {"speed_a": 0.0, "half_life_days": "N/A", "status": f"Error: {str(e)}"}
+
         try:
             hybrid_forecast_data = stock_engine.get_hybrid_cnn_bi_lstm_forecast(data, ticker)
         except Exception as e:
             hybrid_forecast_data = {
-                "ticker": ticker,
-                "direction": "SIDEWAYS",
-                "confidence": 50.0,
-                "predicted_price": 0.0,
-                "expected_high": 0.0,
-                "expected_low": 0.0,
-                "best_chromosome": "EMA(20), RSI(14), BB(20)",
-                "ga_fitness": 50.0,
+                "ticker": ticker, "direction": "SIDEWAYS", "confidence": 50.0,
+                "predicted_price": 0.0, "expected_high": 0.0, "expected_low": 0.0,
+                "best_chromosome": "EMA(20), RSI(14), BB(20)", "ga_fitness": 50.0,
                 "status": f"Error: {str(e)}",
-                "metrics": {
-                    "annualized_revenue_boost": "+35.16%",
-                    "win_rate_boost": "+15.22%"
-                }
+                "metrics": {"annualized_revenue_boost": "+35.16%", "win_rate_boost": "+15.22%"}
             }
         
-        return {
+        result = {
             "ticker": ticker,
             "rekomendasi": rekom,
             "total_skor": total_skor,
@@ -154,11 +191,16 @@ def analyze_stock(ticker: str):
             "crash_momentum": crash_momentum_data,
             "hybrid_forecast": hybrid_forecast_data
         }
+        
+        # Sanitize all numpy types to native Python types for JSON compatibility
+        return sanitize_for_json(result)
+        
+    except HTTPException:
+        raise  # Re-raise FastAPI HTTP exceptions as-is
     except Exception as e:
-        import traceback
         tb_str = traceback.format_exc()
         print(f"CRITICAL API ERROR: {e}\n{tb_str}")
-        raise HTTPException(status_code=500, detail=f"Backend Error: {str(e)}\n{tb_str}")
+        raise HTTPException(status_code=500, detail=f"Backend Error: {str(e)}")
 
 @app.api_route("/health", methods=["GET", "HEAD"])
 def health_check():
