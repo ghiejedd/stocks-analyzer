@@ -35,16 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 let errorMsg = 'Terjadi kesalahan saat mengambil data';
                 try {
-                    const errData = await response.json();
-                    errorMsg = errData.detail || errorMsg;
-                } catch (e) {
+                    const rawText = await response.text();
                     try {
-                        const rawText = await response.text();
+                        const errData = JSON.parse(rawText);
+                        errorMsg = errData.detail || errorMsg;
+                    } catch (jsonErr) {
                         if (rawText && rawText.length < 200) {
                             errorMsg = rawText;
                         }
-                    } catch (textErr) {}
-                }
+                    }
+                } catch (textErr) {}
                 throw new Error(errorMsg);
             }
 
