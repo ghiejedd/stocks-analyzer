@@ -298,12 +298,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Generate stunning gradient colors based on ticker letters
         const gradientList = [
-            ['#3b82f6', '#8b5cf6'], // blue-purple
-            ['#ec4899', '#f43f5e'], // pink-red
-            ['#10b981', '#3b82f6'], // emerald-blue
-            ['#f59e0b', '#ec4899'], // amber-pink
-            ['#8b5cf6', '#d946ef'], // violet-fuchsia
-            ['#06b6d4', '#3b82f6']  // cyan-blue
+            ['#00df89', '#031413'], // GE Vernova electric green to deep forest
+            ['#09ECA9', '#052221'], // Glowing mint to dark slate green
+            ['#10b981', '#031413'], // Emerald to deep forest
+            ['#34d399', '#052221'], // Mint green to dark slate
+            ['#059669', '#022c22'], // Classic deep emerald
+            ['#00f097', '#064e3b']  // Electric bright green to dark forest
         ];
         
         const charSum = ticker.charCodeAt(0) + (ticker.charCodeAt(1) || 0);

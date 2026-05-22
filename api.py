@@ -99,7 +99,7 @@ def analyze_stock(ticker: str):
             profile_data = stock_engine.get_company_profile(saham, ticker)
         except Exception as e:
             clean = ticker.replace('.JK', '').upper()
-            profile_data = {"name": clean, "sector": "N/A", "industry": "N/A", "summary": "Gagal memuat profil.", "website": "N/A", "domain": "", "logo": f"https://ui-avatars.com/api/?name={clean}&background=0D8ABC&color=fff&size=256&bold=true", "logo_hd": ""}
+            profile_data = {"name": clean, "sector": "N/A", "industry": "N/A", "summary": "Gagal memuat profil.", "website": "N/A", "domain": "", "logo": f"https://ui-avatars.com/api/?name={clean}&background=031413&color=09ECA9&size=256&bold=true", "logo_hd": ""}
 
         try:
             news_data = stock_engine.get_news(saham, ticker)

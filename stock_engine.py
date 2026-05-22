@@ -1317,7 +1317,7 @@ def get_company_profile(saham, ticker):
         if not logo:
             logo = safe_get(info, 'logo_url')
             
-        fallback_avatar = f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&background=0D8ABC&color=fff&size=256&bold=true"
+        fallback_avatar = f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&background=031413&color=09ECA9&size=256&bold=true"
             
         return {
             "name": name,
@@ -1332,7 +1332,7 @@ def get_company_profile(saham, ticker):
     except Exception as e:
         clean_ticker = ticker.replace('.JK', '').upper()
         domain = IDX_DOMAINS.get(clean_ticker, "")
-        logo = f"https://www.google.com/s2/favicons?domain=www.{domain}&sz=256" if domain else f"https://ui-avatars.com/api/?name={ticker}&background=0D8ABC&color=fff&size=256&bold=true"
+        logo = f"https://www.google.com/s2/favicons?domain=www.{domain}&sz=256" if domain else f"https://ui-avatars.com/api/?name={ticker}&background=031413&color=09ECA9&size=256&bold=true"
         logo_hd = f"https://img.logo.dev/{domain}?token=pk_anonymous&size=256&format=png" if domain else logo
         return {
             "name": clean_ticker,
