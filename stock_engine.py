@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+import numpy as np
 import warnings
 import math
 import random
@@ -1937,7 +1938,7 @@ def check_statistical_arbitrage(prices_a, ticker_a):
         p_val = 0.05
         coint_status = True
         try:
-            from statsmodels.tsa.stattools import coint
+            from statsmodels.tsa.stattools import coint  # type: ignore
             _, p_val, _ = coint(df['A'], df['B'])
             coint_status = p_val < 0.05
         except Exception:
