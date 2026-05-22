@@ -439,7 +439,7 @@ def get_fundamental(saham, kode):
                 "dcf_val": "N/A",
                 "dcf_diff": "N/A",
                 "dcf_status": "N/A",
-                "dcf_params": {},
+                "dcf_params": "N/A",
                 "piotroski_val": "0/9",
                 "piotroski_details": [],
                 "altman_val": "N/A",
