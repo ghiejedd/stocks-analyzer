@@ -229,6 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHybridForecast(data.hybrid_forecast);
         renderUMAShield(data.uma_filter);
         renderMeanReversionOU(data.mean_reversion_ou);
+        renderCompanyProfile(profile.summary);
         // --- 5. Clean up any previous ticker ---
         if (liveTickerInterval) {
             clearInterval(liveTickerInterval);
