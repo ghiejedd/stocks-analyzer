@@ -405,7 +405,81 @@ def get_fundamental(saham, kode):
             }
         }
     except Exception as e:
-        return {"error": str(e), "skor": 0, "alasan": []}
+        price_fallback = 0.0
+        try:
+            hist = saham.history(period="1d")
+            if not hist.empty:
+                price_fallback = float(hist['Close'].iloc[-1])
+        except Exception:
+            pass
+        return {
+            "error": str(e),
+            "skor": 0,
+            "alasan": [f"Gagal mengambil data fundamental lengkap dari Yahoo Finance ({str(e)}). Menggunakan estimasi minimal."],
+            "valuasi": {
+                "per": "N/A",
+                "fwd_pe": "N/A",
+                "peg": "N/A",
+                "pbv": "N/A",
+                "ps": "N/A",
+                "ev_ebitda": "N/A",
+                "ev_rev": "N/A",
+                "graham_val": "N/A",
+                "graham_diff": "N/A",
+                "graham_status": "N/A",
+                "dcf_val": "N/A",
+                "dcf_diff": "N/A",
+                "dcf_status": "N/A",
+                "dcf_params": {},
+                "piotroski_val": "0/9",
+                "piotroski_details": [],
+                "altman_val": "N/A",
+                "altman_status": "N/A"
+            },
+            "profitabilitas": {
+                "roe": "N/A",
+                "roa": "N/A",
+                "gpm": "N/A",
+                "ebitda_margin": "N/A",
+                "opm": "N/A",
+                "npm": "N/A"
+            },
+            "laporan_keuangan": {
+                "rev": "N/A",
+                "ebitda": "N/A",
+                "ni": "N/A",
+                "eps": "N/A",
+                "fwd_eps": "N/A",
+                "bv": "N/A",
+                "td": "N/A",
+                "tc": "N/A",
+                "ocf": "N/A",
+                "fcf": "N/A",
+                "der": "N/A",
+                "cr": "N/A",
+                "qr": "N/A"
+            },
+            "pertumbuhan": {
+                "rev_growth_yoy": "N/A",
+                "earn_growth_yoy": "N/A",
+                "rev_growth_qoq": "N/A",
+                "earn_growth_qoq": "N/A"
+            },
+            "market_info": {
+                "dy": "N/A",
+                "dps": "N/A",
+                "payout": "N/A",
+                "mcap": "N/A",
+                "ev": "N/A",
+                "beta": "N/A",
+                "avg_vol": "N/A",
+                "hi52": "N/A",
+                "lo52": "N/A",
+                "pct_from_hi": "N/A",
+                "pct_from_lo": "N/A",
+                "price": price_fallback
+            }
+        }
 
 def _calculate_parabolic_sar(data, af_start=0.02, af_step=0.02, af_max=0.20):
     """Calculate Parabolic SAR using Wilder's method."""

@@ -39,14 +39,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Small delay to make shimmer skeleton feel premium
             setTimeout(() => {
-                renderDashboard(data);
-                loader.style.display = 'none';
-                dashboard.style.display = 'block';
-                
-                // Trigger smooth fade-in
-                setTimeout(() => {
-                    dashboard.classList.add('active');
-                }, 50);
+                try {
+                    renderDashboard(data);
+                    loader.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    
+                    // Trigger smooth fade-in
+                    setTimeout(() => {
+                        dashboard.classList.add('active');
+                    }, 50);
+                } catch (renderErr) {
+                    console.error("Gagal me-render dashboard:", renderErr);
+                    loader.style.display = 'none';
+                    errorText.textContent = `Gagal me-render dashboard: ${renderErr.message}`;
+                    errorContainer.style.display = 'flex';
+                }
             }, 800);
 
         } catch (err) {
