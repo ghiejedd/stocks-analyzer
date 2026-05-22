@@ -1,0 +1,321 @@
+﻿Formulasi Komputasional dan Sistem Pengambilan Keputusan Transaksi Kuantitatif pada Bursa Efek Indonesia: Analisis Empiris Jurnal Q1 Elsevier
+Struktur mikro pasar modal Indonesia, atau Bursa Efek Indonesia (BEI), menyajikan karakteristik unik yang didominasi oleh aktivitas investor ritel domestik. Perilaku pasar ini sering kali diwarnai oleh bias kognitif, efek kawanan (herding behavior), serta fenomena ketakutan tertinggal (FOMO), yang memicu volatilitas tinggi dan anomali harga jangka pendek. Di sisi lain, regulasi BEI menerapkan aturan ketat seperti batasan persentase penolakan otomatis (auto rejection) dan pembatasan transaksi penjualan kosong (short-selling) bagi pelaku pasar ritel. Kondisi ini menuntut perancangan sistem perdagangan kuantitatif yang tidak hanya adaptif terhadap pergeseran volatilitas, tetapi juga mampu menyaring manipulasi pasar sebelum menghasilkan sinyal beli (buy) dan jual (sell).
+Laporan riset ini menyajikan tinjauan mendalam mengenai metodologi kuantitatif yang bersumber dari literatur akademis terindeks Q1 Elsevier dan jurnal bereputasi tinggi lainnya. Fokus utama laporan ini adalah merumuskan aturan eksekusi matematis yang presisi untuk diterapkan ke dalam arsitektur platform analisis web kuantitatif pada saham-saham di Indonesia.
+1. Penyaringan Mikro: Pendeteksian Manipulasi, Diversifikasi Sektoral, dan Seleksi Multi-Faktor PCA-EVA
+Sebelum algoritme menghasilkan sinyal transaksi, sistem harus melakukan penyaringan multi-tahap pada semesta saham untuk menghindari jebakan volatilitas semu dan manipulasi harga yang kerap terjadi pada emiten berkapitalisasi kecil di BEI.
+Penyaringan Tahap 1: Pendeteksian Manipulasi Saham (Unusual Market Activity)
+Salah satu risiko terbesar di pasar berkembang seperti Indonesia adalah praktik manipulasi pasar (pump and dump). Regulator BEI secara berkala menandai saham-saham tertentu sebagai emiten dengan Aktivitas Pasar Tidak Biasa atau Unusual Market Activity (UMA).
+Untuk memitigasi risiko ini, sistem analisis dapat mengintegrasikan model klasifikasi pembelajaran mesin terawasi (supervised machine learning). Penelitian menunjukkan bahwa penggunaan algoritme Random Forest yang dikombinasikan dengan teknik penyampelan acak minoritas sintetis (Synthetic Minority Oversampling Technique - SMOTE) mampu memprediksi potensi manipulasi pasar secara presisi. Dengan menganalisis data harga historis jangka pendek (jendela waktu 3 hari), model klasifikasi ini mampu mendeteksi pola manipulasi harga dengan akurasi mencapai 97%.
+Saham yang teridentifikasi memiliki probabilitas manipulasi tinggi harus langsung dikeluarkan dari semesta investasi (investment universe) sebelum sinyal perdagangan dihitung.
+Penyaringan Tahap 2: Analisis Kointegrasi Sektoral untuk Diversifikasi Portofolio
+Asumsi umum bahwa seluruh sektor di BEI selalu bergerak searah dalam jangka panjang secara empiris tidak terbukti. Pengujian kointegrasi multivariat menggunakan metode Johansen terhadap indeks sektoral mingguan menunjukkan bahwa tidak ada kointegrasi atau hubungan ekuilibrium jangka panjang yang stabil di antara sembilan indeks sektor utama di BEI.
+Ketidakhadiran kointegrasi jangka pendek ini disebabkan oleh adanya faktor penggerak unik (idiosyncratic factors) yang memengaruhi masing-masing sektor secara berbeda. Namun, dalam jangka menengah, hubungan kointegrasi mulai terbentuk karena pengaruh faktor makroekonomi dan sentimen politik nasional yang menggerakkan seluruh sektor ke arah yang sama.
+Implikasi bagi arsitektur sistem analisis web adalah pembuatan portofolio kuantitatif harus memanfaatkan diversifikasi sektoral aktif dalam jangka pendek untuk meminimalkan risiko beta pasar secara efektif.
+Penyaringan Tahap 3: Seleksi Saham Multi-Faktor Berbasis PCA dan EVA
+Untuk menyusun portofolio saham unggulan yang secara konsisten mengungguli indeks acuan, sistem harus menerapkan seleksi saham multi-faktor. Pendekatan modern menggabungkan Analisis Komponen Utama (Principal Component Analysis - PCA) untuk reduksi dimensi data finansial dengan kriteria Nilai Tambah Ekonomi (Economic Value-Added - EVA) untuk mengukur penciptaan nilai absolut perusahaan.
+Proses seleksi ini menyaring indikator keuangan ke dalam 11 kategori utama untuk membentuk skor fundamental komposit :
+Kategori Evaluasi
+	Indikator Keuangan Utama yang Digunakan
+	Solvabilitas (Solvency)
+	Rasio Lancar (Current Ratio), Rasio Cepat (Quick Ratio), Rasio Utang terhadap Ekuitas (Equity Ratio), Rasio Utang Jangka Panjang.
+	Struktur Rasio (Ratio Structure)
+	Proporsi Laba Bersih Induk, Rasio Modal Kerja (Working Capital Ratio).
+	Kemampuan Operasional
+	Tingkat Perputaran Piutang (Accounts Receivable Turnover), Tingkat Perputaran Persediaan.
+	Tingkat Risiko & Perkembangan
+	Laju Preservasi Modal, Laju Akumulasi Modal, Laju Pertumbuhan Berkelanjutan (Sustainable Growth Rate), Pertumbuhan Pendapatan Operasional.
+	Arus Kas (Cash Flow)
+	Kandungan Kas Bersih dari Laba Bersih, Arus Kas Perusahaan, Rasio Pemulihan Kas Total.
+	Nilai Tambah Ekonomi (EVA)
+	Nilai Tambah EVA, Laju Pertumbuhan EVA.
+	Melalui transformasi Z-Score, indikator-indikator tersebut dinormalisasi sebelum diproyeksikan ke dalam ruang dimensi baru menggunakan PCA untuk mengeliminasi multikolinearitas. Saham dengan skor komposit PCA-EVA tertinggi dimasukkan ke dalam kerangka transaksi kuantitatif bulanan.
+2. Strategi Arbitrase Statistik Berbasis Kointegrasi (Engle-Granger & GARCH)
+Setelah semesta saham disaring dari manipulasi dan dioptimalkan secara fundamental, sistem dapat mengaktifkan strategi arbitrase statistik (statistical arbitrage) pada pasangan saham yang terbukti memiliki hubungan ekuilibrium jangka panjang yang kokoh.
+Formulasi Matematis Spread dan Z-Score Dinamis
+Dalam mengidentifikasi pasangan aset (pairs trading), metode dua langkah Engle-Granger menjadi standar ekonometrika yang andal. Jika dua saham perbankan berkapitalisasi besar di BEI (misalnya BBCA dan BBRI) dikonfirmasi memiliki deret harga non-stasioner terintegrasi pada ordo satu, atau I(1), persamaan regresi kointegrasi kuadrat terkecil (OLS) dirumuskan sebagai berikut :
+Di mana P_{A,t} mewakili harga saham dependen (BBCA), P_{B,t} adalah harga saham independen (BBRI), \beta adalah rasio lindung nilai (hedge ratio), \alpha adalah intersep konstan, dan \epsilon_t menyatakan residual atau nilai spread mentah. Kelayakan kointegrasi diverifikasi jika sisaan regresi (\epsilon_t) terbukti stasioner pada level I(0) melalui uji Augmented Dickey-Fuller (ADF) pada tingkat signifikansi p < 0,05.
+Karena pasar berkembang rentan terhadap guncangan volatilitas yang tidak konstan dari waktu ke waktu (heteroskedastic), penentuan ambang batas statis sangat berisiko memicu sinyal palsu. Sistem web harus menskalakan residual \epsilon_t secara dinamis menggunakan varians kondisional \sigma_t^2 yang diestimasi lewat model GARCH(1,1) :
+Di mana \omega > 0 menyatakan konstanta, \alpha_1 \ge 0 adalah koefisien efek ARCH (kejutan volatilitas periode sebelumnya), dan \beta_1 \ge 0 adalah koefisien efek GARCH (persistensi volatilitas jangka panjang). Skor standar penyesuaian volatilitas (Standardized Z-Score) z_t dihitung sebagai :
+Aturan Eksekusi Transaksi Long-Only Saham Indonesia
+Karena BEI melarang transaksi penjualan kosong (short-selling) bagi mayoritas akun ritel, strategi arbitrase statistik harus dimodifikasi menjadi model long-only atau pertukaran kepemilikan aset secara dinamis. Keputusan transaksi dipisahkan ke dalam lima klasifikasi sinyal keputusan :
+Nilai Klasifikasi Sinyal
+	Kondisi Batas Z-Score (z_t)
+	Tindakan Eksekusi (Saham BEI)
+	Penjelasan Mekanisme Finansial
+	Label 1 (Beli Saham A)
+	z_t < -2,0
+	Lakukan pembelian Saham A (BBCA) dengan mengalokasikan kas dari penjualan Saham B.
+	Nilai spread menyimpang jauh di bawah rata-rata historisnya; Saham A relatif terlalu murah (undervalued) dibanding Saham B.
+	Label 2 (Beli Saham B)
+	z_t > +2,0
+	Lakukan pembelian Saham B (BBRI) dengan mengalokasikan kas dari penjualan Saham A.
+	Nilai spread menyimpang jauh di atas rata-rata historisnya; Saham B relatif terlalu murah dibanding Saham A.
+	Label 3 (Keluar/Exit)
+	-0,5 < z_t < 0,5
+	Jual seluruh posisi aktif baik Saham A maupun Saham B untuk kembali ke posisi kas penuh.
+	Nilai spread telah kembali mendekati ekuilibrium rata-rata jangka panjang (mean reversion).
+	Label 4 (Stop-Loss)
+	\|z_t\| \ge 3
+	Segera lakukan likuidasi paksa pada seluruh kepemilikan aktif.
+	Deviasi terus melebar melewati batas statistik normal, mengindikasikan kerusakan kointegrasi permanen (decoupling).
+	Label 0 (Tahan/Hold)
+	-2,0 \le z_t \le 2,0
+	Pertahankan posisi portofolio saat ini; dilarang melakukan transaksi baru.
+	Spread bergerak dalam rentang fluktuasi normal.
+	
+
+	
+
+	
+
+	
+
+	Analisis Kinerja Komparatif: Ekonometrika Tradisional vs. Deep Arbitrage LSTM
+Pengujian historis di luar sampel (out-of-sample backtesting) selama periode 1 September 2021 hingga 6 April 2025 membandingkan efektivitas metode ekonometrika konvensional dengan pemodelan Deep Arbitrage berbasis jaringan memori jangka pendek-panjang atau Long Short-Term Memory (LSTM).
+Model LSTM dirancang dengan masukan berupa urutan historis spread 20 hari perdagangan [spread_{t-20}, \ldots, spread_{t-1}] untuk mengklasifikasikan target sinyal keputusan (Label 0 hingga 4).
+Metrik Evaluasi Kinerja (Periode OOS 2021-2025)
+	Arbitrase Statistik Tradisional (GARCH)
+	Deep Arbitrage Berbasis LSTM
+	Kumulatif Imbal Hasil (Portfolio Return)
+	482%
+	735%
+	Rasio Sharpe (Sharpe Ratio)
+	0,69
+	1,67
+	Total Transaksi Eksekusi (Trades)
+	61 Transaksi
+	37 Transaksi
+	- Transaksi Saham A (BBCA)
+	30 Transaksi
+	18 Transaksi
+	- Transaksi Saham B (BBRI)
+	31 Transaksi
+	19 Transaksi
+	Keunggulan mutlak model LSTM terletak pada kemampuan penapisan sinyal palsu di pasar saham Indonesia. Dengan mengeksekusi jumlah transaksi yang jauh lebih sedikit (37 berbanding 61), model LSTM berhasil mengidentifikasi pola nonlinearitas spread dan mengabaikan anomali volatilitas sesaat. Hal ini sangat krusial bagi investor ritel BEI untuk mereduksi beban gesekan biaya transaksi (transaction costs & slippage) yang dapat menggerus profitabilitas bersih strategi kuantitatif secara signifikan.
+Perangkap Metodologis yang Harus Dihindari pada Website Kuantitatif: Klusterisasi Fourier K-Means
+Salah satu perangkap akademis yang harus dihindari oleh pengembang website kuantitatif adalah penggunaan metode Transformasi Fourier Diskrit (Discrete Fourier Transform - DFT) yang dikombinasikan dengan klusterisasi K-Means untuk pemilihan pasangan saham secara otomatis.
+Meskipun visualisasi hasil klusterisasi saham anggota indeks IDX80 berdasarkan periodisitas gelombang Fourier tampak rapi pada periode pelatihan, analisis ekonometrika lanjutan menunjukkan bahwa nilai Indeks Rand yang Disesuaikan (Adjusted Rand Index) di antara hasil klusterisasi tahunan berada pada angka mendekati nol.
+Hal ini membuktikan tidak adanya konsistensi hubungan spasial antar-saham dari tahun ke tahun. Metode klusterisasi Fourier K-Means tidak stabil untuk mendiversifikasi portofolio investasi maupun sebagai basis pencarian pasangan kointegrasi jangka panjang (pairs selection).
+3. Strategi Mean Reversion Berbasis Bollinger Bands, RSI, dan Proses Stokastik
+Strategi pembalikan nilai rata-rata (mean reversion) berasumsi bahwa harga aset yang mengalami penyimpangan ekstrem akibat reaksi berlebihan pasar akan ditarik kembali menuju nilai ekuilibrium jangka panjangnya.
+Formulasi Matematika Indikator Bollinger Bands & Kecepatan Pembalikan Rata-Rata
+Sistem kuantitatif mengukur deviasi ekstrem menggunakan Bollinger Bands dengan periode default n = 20 hari perdagangan dan faktor pengali deviasi standar k = 2. Rumus perhitungan dasarnya adalah sebagai berikut :
+Untuk memodelkan kecepatan pembalikan harga menuju nilai rata-rata tersebut secara kontinu, sistem dapat menerapkan model stokastik persisten seperti proses Ornstein-Uhlenbeck (OU) yang digunakan pada penilaian obligasi retail negara di BEI (seperti ORI) :
+Di mana a menyatakan laju kecepatan pembalikan arah kembali ke nilai rata-rata (reversion speed parameter), b mewakili tingkat rata-rata jangka panjang (mean level), dan dW_t mengindikasikan proses Wiener standar. Semakin tinggi parameter a yang diestimasi dari data historis saham, semakin pendek durasi yang dibutuhkan oleh harga saham untuk kembali ke pita tengah Bollinger Bands (Middle Band), yang secara teoretis mempertinggi tingkat keberhasilan transaksi kuantitatif.
+Aturan Keputusan Entri dan Keluar Transaksi
+Dalam meminimalkan risiko terjebak pada tren yang berkepanjangan (trending market), sinyal Bollinger Bands harus dikonfirmasi oleh indikator kekuatan relatif atau Relative Strength Index (RSI) 14-periode :
+Kondisi Arah Pasar
+	Aturan Pembukaan Posisi (Trigger Buy)
+	Pengelolaan Risiko (Stop-Loss)
+	Aturan Target Profit (Exit)
+	Pembalikan Naik (Bullish Reversion)
+	Harga penutupan harian memotong ke bawah pita bawah Bollinger Bands (P_t < \text{Lower Band}_t) disertai nilai \text{RSI}_t(14) < 30.
+	Stop-loss diletakkan 2% di bawah titik terendah dari pola lilin pembalikan terakhir (swing low).
+	Keluar dari posisi ketika harga ditutup menyentuh atau melampaui garis tengah \text{Middle Band}_t.
+	Pembalikan Turun (Bearish Reversion)
+	Harga penutupan harian memotong ke atas pita atas Bollinger Bands (P_t > \text{Upper Band}_t) disertai nilai \text{RSI}_t(14) > 70.
+	Stop-loss diletakkan 2% di atas titik tertinggi dari pola lilin pembalikan terakhir (swing high).
+	Keluar dari posisi ketika harga ditutup kembali menyentuh garis tengah \text{Middle Band}_t.
+	4. Strategi Momentum Sektoral, Crash-Based Timing, dan Optimasi Genetik
+Strategi momentum beroperasi secara kontradiktif dengan strategi mean reversion, di mana investor membeli aset yang berkinerja unggul (winners) dan menjual aset berkinerja buruk (losers) dengan ekspektasi bahwa tren pergerakan harga akan terus berlanjut dalam rentang waktu tertentu.
+Efek Momentum di Bursa Efek Indonesia
+Efek momentum terbukti eksis secara signifikan di BEI, khususnya pada saham-saham likuid berkapitalisasi besar seperti kelompok Kompas100 dan LQ45. Fenomena ini terjadi akibat reaksi lambat (underreaction) pelaku pasar ritel domestik berskala kecil dalam merespons pengumuman laporan keuangan atau berita fundamental positif emiten.
+Arus masuk modal ritel secara perlahan menciptakan tren kenaikan harga yang berkelanjutan, yang pada fase akhirnya menarik minat beli kawanan investor ritel berskala besar akibat pengaruh FOMO, sehingga memicu kondisi penilaian harga yang terlalu tinggi (overreaction).
+Namun, strategi momentum murni memiliki kelemahan laten berupa risiko kehancuran momentum (momentum crashes) yang terjadi secara mendadak saat pasar mengalami kepanikan atau pembalikan tren makroekonomi secara global.
+Strategi Momentum Berbasis Koreksi Kejatuhan Pasar (Crash-Based Momentum)
+Untuk mengatasi risiko kejatuhan tak terduga, riset keuangan perilaku merumuskan strategi momentum berbasis kepanikan (Crash-Based Quantitative Trading). Strategi ini dibagi menjadi dua skema implementasi taktis :
+1. Crash + Timing Strategy: Strategi ini mengestimasi probabilitas terjadinya kejatuhan harga ekstrem secara ex-ante pada saham-saham yang dinilai terlalu mahal (overpriced). Dengan melacak lonjakan volatilitas dan pergeseran distribusi probabilitas ke arah ekor kiri (fat-tail risk), sistem akan keluar dari posisi momentum sebelum koreksi ekstrem pasar terjadi.
+2. Crash + Momentum-Reversal Strategy: Diimplementasikan saat pasar berada dalam fase panik hebat setelah mengalami penurunan tajam yang disertai volatilitas sangat tinggi. Pada kondisi kepanikan kolektif ini, saham-saham berkinerja buruk (past losers) cenderung mengalami depresiasi harga yang melampaui nilai wajarnya akibat aksi jual panik. Strategi ini dirancang untuk membeli saham-saham past losers pada fase akumulasi setelah kepanikan mereda, guna menangkap imbal hasil abnormal yang sangat tinggi saat pasar berbalik arah naik (market rebound).
+Solusi Pemfilteran Tren: Menghindari Masalah Kejenuhan Sinyal (Zero-Trade Problem)
+Banyak sistem perdagangan kuantitatif yang menerapkan logika persilangan indikator secara tidak efisien. Sebagai contoh, aturan entri yang mensyaratkan: Beli ketika RSI berada di area oversold (RSI < 30) DAN indikator MACD mengalami persilangan naik (bullish crossover).
+Dalam prakteknya, kondisi ini hampir tidak pernah terjadi secara bersamaan. Ketika RSI berada di bawah level 30, momentum penurunan harga sedang berada pada fase terkuatnya. Sebaliknya, persilangan naik MACD baru akan terbentuk setelah harga mulai mengalami pemulihan yang signifikan dari titik terendahnya, yang otomatis mendorong nilai RSI keluar dari area di bawah 30. Aturan kaku ini menghasilkan penyaringan super-ketat yang menyebabkan sistem tidak pernah mengeksekusi perdagangan sama sekali (zero-trade).
+Untuk menyelesaikan kegagalan logika ini, sistem analisis harus memisahkan fungsi identifikasi arah tren utama dengan penentuan waktu entri jangka pendek. Kombinasi indikator kekuatan tren Average Directional Index (ADX) dan Exponential Moving Average (EMA) 50-hari digunakan sebagai filter utama :
+ 
+- Konfi[span_148](start_span)[span_148](end_span)rmasi Tren Kuat: Nilai ADX(14) > 20 (mengidentifikasi adanya tren yang jelas).
+- Arah Tren Nai[span_149](start_span)[span_149](end_span)k: Harga penutupan berada di atas EMA(50).
+
+             [span_150](start_span)[span_150](end_span)       │
+                    ▼ (Jika Terpenuhi)
+                    
+
+- Entri Beli: Tunggu hingga RSI(14) mengalami penurunan (pullback) ke area netral-bawah (skala 30-40),
+ kemudian lakukan eksekusi beli sesaat setelah nilai RSI memotong kembali ke atas level 40.
+
+Melalui pemisahan fungsi filter tren utama dengan pemicu entri osilator ini, sistem analisis web dapat mendeteksi peluang transaksi secara optimal pada saham-saham BEI tanpa mengalami pembekuan operasi algoritme (zero-trade).
+Optimasi Sistem dengan Algoritme Genetika (Genetic Algorithm)
+Untuk menentukan parameter indikator teknikal yang paling optimal bagi setiap karakteristik saham BEI yang dinamis, sistem analisis dapat mengintegrasikan algoritme optimasi genetika (Genetic Algorithm - GA). Algoritme genetika memperlakukan parameter indikator (seperti panjang periode EMA, ambang batas RSI, atau pengali deviasi standar Bollinger Bands) sebagai untaian kromosom yang terus dievolusikan melalui tahapan seleksi, silang-silang (crossover), dan mutasi acak.
+Uji coba empiris menunjukkan bahwa parameter indikator teknikal yang dioptimalkan menggunakan algoritme genetika mampu menghasilkan peningkatan imbal hasil portofolio rata-rata sebesar 4% di atas strategi beli-dan-tahan (Buy & Hold) konvensional.
+Lebih lanjut, jika parameter teknikal hasil optimasi genetika ini diintegrasikan ke dalam arsitektur prediksi jaringan saraf hibrida seperti kombinasi CNN-Bi-LSTM (jaringan saraf konvolusional dan LSTM dua arah), performa sistem perdagangan kuantitatif akan meningkat secara eksponensial. Integrasi sistem hibrida ini mampu meningkatkan laba akhir investasi secara signifikan, meningkatkan pendapatan tahunan (annualized revenue) sebesar 35,16%, serta menaikkan tingkat kemenangan transaksi (winning rate) sebesar 15,22%.
+5. Implementasi Backend Sistem Analisis Web Kuantitatif Saham Indonesia
+Pengembangan platform analisis kuantitatif saham di Indonesia menghadapi kendala struktural berupa ketiadaan gerbang antarmuka pemrograman aplikasi (API) transaksi ritel harian yang terbuka secara gratis dari BEI.
+Oleh karena itu, arsitektur data backend website harus dirancang secara mandiri untuk menarik data harga harian historis (OHLCV) serta data sekunder penting seperti ringkasan volume transaksi broker (broker summary), aktivitas transaksi asing (foreign flow), dan keterbukaan informasi kepemilikan saham dari BEI.
+Desain Alur Pengumpulan Data (Pre-Market Setup Pipeline)
+Untuk menghasilkan keputusan transaksi harian yang akurat, sistem backend disarankan menjalankan skrip otomatisasi (misalnya menggunakan pustaka Python dan penjadwal tugas harian) sebelum jam perdagangan BEI dibuka :
+Mengunduh data transaksi akhir hari sebelumnya (EoD) dan berita emiten terbaru dari portal BEI.
+
+     [span_172](start_span)[span_172](end_span)[span_174](start_span)[span_174](end_span)                │
+                     ▼
+                     
+
+1. Jalankan klasifikasi Random Forest-SMOTE untuk menyaring emiten berpotensi manipulasi (UMA).
+2. Lakukan seleksi multi-faktor PCA-EVA pada sisa emiten sehat.
+3. Hitung uji kointegrasi Engle-Granger pada pasangan saham terpilih.[span_177](start_span)[span_177](end_span)
+
+                     │
+                     ▼
+                     
+
+Menganalisis sentimen berita harian menggunakan pemrosesan bahasa alami (NLP).[span_178](start_span)[span_178](end_span)[span_179](start_span)[span_179](end_span)
+Menghitung indikator teknikal Bollinger Bands, RSI, MACD, dan ADX.[span_180](start_span)[span_180](end_span)[span_181](start_span)[span_181](end_span)
+
+                     │
+                     ▼
+                     
+
+Menampilkan sinyal final keputusan entri "Buy", "Sell", "Hold", atau "Stop-Loss" pada dasbor analisi[span_16](start_span)[span_16](end_span)s web.[span_182](start_span)[span_182](end_span)[span_183](start_span)[span_183](end_span)
+
+### Cetak Biru Modul Python Backend Engine Berikut adalah kode program Python berstandar industri menggunakan pustaka ilmiah pandas, numpy, dan statsmodels yang dapat langsung diintegrasikan ke dalam backend arsitektur website analisis untuk memproses data saham secara otomatis.
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+from statsmodels.tsa.stattools import coint, adfuller
+
+class IndonesianEquityQuantEngine:
+   def __init__(self, bb_window=20, bb_std_multiplier=2, rsi_period=14, adx_period=14):
+       self.bb_window = bb_window
+       self.bb_std_multiplier = bb_std_multiplier
+       self.rsi_period = rsi_period
+       self.adx_period = adx_period
+
+   def check_engle_granger_cointegration(self, prices_a, prices_b):
+       """
+       Menghitung hubungan kointegrasi dua langkah Engle-Granger.[span_187](start_span)[span_187](end_span)[span_188](start_span)[span_188](end_span)
+       Input: prices_a dan prices_b berupa pandas Series berisi harga penutupan harian.
+       """
+       log_a = np.log(prices_a)
+       log_b = np.log(prices_b)
+       
+       # Langkah 1: Regresi Linier OLS untuk mengestimasi hedge ratio (beta) [span_189](start_span)[span_189](end_span)[span_191](start_span)[span_191](end_span)
+       X = sm.add_constant(log_b)
+       ols_model = sm.OLS(log_a, X).fit()
+       beta = ols_model.params.iloc
+       alpha = ols_model.params.iloc
+       
+       # Langkah 2: Uji ADF pada residual regresi [span_190](start_span)[span_190](end_span)[span_192](start_span)[span_192](end_span)
+       residuals = ols_model.resid
+       adf_test = adfuller(residuals)
+       p_value_adf = adf_test
+       
+       # Uji kointegrasi dua langkah langsung via statsmodels [span_193](start_span)[span_193](end_span)[span_194](start_span)[span_194](end_span)
+       _, p_value_coint, _ = coint(log_a, log_b)
+       
+       # Kointegrasi terkonfirmasi jika salah satu p-value < 0.05 [span_195](start_span)[span_195](end_span)[span_196](start_span)[span_196](end_span)
+       is_cointegrated = (p_value_adf < 0.05) or (p_value_coint < 0.05)
+       
+       return {
+           "cointegrated": is_cointegrated,
+           "hedge_ratio": beta,
+           "intercept": alpha,
+           "p_value_adf": p_value_adf,
+           "p_value_coint": p_value_coint,
+           "residuals": residuals.tolist()
+       }
+
+   def compute_mean_reversion_indicators(self, df):
+       """
+       Menghitung Bollinger Bands harian dan RSI harian.
+       Input df harus mengandung kolom 'close'.
+       """
+       df_calc = df.copy()
+       
+       # Perhitungan Bollinger Bands 
+       df_calc['sma'] = df_calc['close'].rolling(window=self.bb_window).mean()
+       df_calc['std_dev'] = df_calc['close'].rolling(window=self.bb_window).std()
+       df_calc['upper_band'] =[span_96](start_span)[span_96](end_span)[span_99](start_span)[span_99](end_span) df_calc['sma'] + (self.bb_std_multiplier * df_calc['std_dev'])
+       df_calc['lower_band'] = df_calc['sma'] - (self.bb_std_multiplier [span_97](start_span)[span_97](end_span)[span_100](start_span)[span_100](end_span)* df_calc['std_dev'])
+       
+       # Perhitungan RSI 14-hari 
+       price_diff = df_calc['close'].diff()
+       positive_gains = price_diff.where(price_diff > 0, 0.0)
+       negative_losses = -price_diff.where(price_diff < 0, 0.0)
+       
+       avg_gain = positive_gains.rolling(window=self.rsi_period).mean()
+       a[span_121](start_span)[span_121](end_span)vg_loss = negative_losses.rolling(window=self.rsi_period).mean()
+       
+       relative_strength = avg_gain / (avg_loss + 1e-9)
+       df_calc['rsi'] = 100.0 - (100.0 / (1.0 + relative_strength))
+       
+       return df_calc
+
+   def compute_trend_momentum_filters(self, df):
+       """
+       Menghitung filter tren harian EMA dan kekuatan tren menggunakan ADX.
+       Input df harus memiliki kolom 'high', 'low', 'close'.
+       """
+       df_calc = df.copy()
+       
+       # Filter EMA 50-hari 
+    [span_152](start_span)[span_152](end_span)   df_calc['ema_50'] = df_calc['close'].ewm(span=50, adjust=False).mean()
+       
+       # Estimasi True Range (TR) dan Arah Pergerakan (Di[span_153](start_span)[span_153](end_span)rectional Movement)
+       df_calc['h_l'] = df_calc['high'] - df_calc['low']
+       df_calc['h_pc'] = np.abs(df_calc['high'] - df_calc['close'].shift(1))
+       df_calc['l_pc'] = np.abs(df_calc['low'] - df_calc['close'].shift(1))
+       df_calc['true_range'] = df_calc[['h_l', 'h_pc', 'l_pc']].max(axis=1)
+       
+       up_move = df_calc['high'] - df_calc['high'].shift(1)
+       down_move = df_calc['low'].shift(1) - df_calc['low']
+       
+       df_calc['plus_dm'] = np.where((up_move > down_move) & (up_move > 0), up_move, 0.0)
+       df_calc['minus_dm'] = np.where((down_move > up_move) & (down_move > 0), down_move, 0.0)
+       
+       # Penghalusan (Smoothing) Wilder
+       tr_smoothed = df_calc['true_range'].rolling(window=self.adx_period).sum()
+       plus_di = 100.0 * (df_calc['plus_dm'].rolling(window=self.adx_period).sum() / (tr_smoothed + 1e-9))
+       minus_di = 100.0 * (df_calc['minus_dm'].rolling(window=self.adx_period).sum() / (tr_smoothed + 1e-9))
+       
+       # Indikator Arah Rata-Rata (ADX)
+       directional_index = 100.0 * np.abs(plus_di - minus_di) / (plus_di + minus_di + 1e-9)
+       df_calc['adx'] = directional_index.rolling(window=self.adx_period).mean()
+       
+       return df_calc
+
+   def generate_final_trading_signals(self, df):
+       """
+       Menghasilkan keputusan final eksekusi kuantitatif harian.[span_197](start_span)[span_197](end_span)[span_198](start_span)[span_198](end_span)[span_199](start_span)[span_199](end_span)
+       """
+       df_signals = self.compute_mean_reversion_indicators(df)
+       df_filters = self.compute_trend_momentum_filters(df)
+       
+       df_signals['ema_50'] = df_filters['ema_50']
+       df_signals['adx'] = df_filters['adx']
+       
+       # Inisialisasi kolom keputusan sinyal (0 = Hold, 1 = Buy, -1 = Sell/Exit) [span_200](start_span)[span_200](end_span)
+       df_signals['trade_signal'] = 0
+       
+       # Aturan Sinyal Beli (Long Entry): Tren naik + Momentum kuat + RSI Pullback 
+       df_signals.loc[
+           (df_signals['close'] > df_signals['ema_50']) & 
+           (df_signals['adx'] > 20) & 
+           (df_signal[span_157](start_span)[span_157](end_span)[span_161](start_span)[span_161](end_span)s['rsi'] < 40) & 
+           (df_signals['rsi'].shift(1) < df_signals['rsi']), 
+           'trade_signal'
+       ] = 1
+       
+       # Aturan Sinyal Jual (Exit): Harga menembus di bawah EMA atau RSI jenuh beli ekstrem 
+       df_signals.loc[
+           (df_signals['close'] < df_signals['ema_50']) | 
+           (df_signals['rsi'] > 75), 
+           'trade_sign[span_158](start_span)[span_158](end_span)[span_162](start_span)[span_162](end_span)al'
+       ] = -1
+       
+       return df_signals
+
+6. Sintesis Akademis dan Panduan Pengembangan Sistem Analisis Web
+Berdasarkan kompilasi literatur jurnal Q1 Elsevier dan bukti empiris pasar saham Indonesia, penyusunan arsitektur sistem perdagangan kuantitatif pada website analisis wajib memperhatikan pedoman strategis berikut:
+1. Penerapan Filter Keamanan Sebelum Eksekusi: Platform analisis web harus memprioritaskan fitur keamanan portofolio dengan menyaring saham-saham UMA menggunakan kombinasi model Random Forest dan SMOTE. Saham yang lolos kurasi kemudian dievaluasi menggunakan analisis kointegrasi Engle-Granger untuk memastikan kestabilan pergerakan harga spread secara statistik.
+2. Mitigasi Aturan Eksekusi Biasa: Untuk menghindari tidak terbitnya rekomendasi beli dan jual akibat parameter yang saling bertabrakan (zero-trade problem), platform disarankan membagi fungsionalitas algoritme menjadi dua filter mandiri: indikator ADX (>20) bersama EMA-50 untuk mengidentifikasi dominasi arah tren makro, serta indikator osilator RSI harian sebagai eksekutor waktu penentuan entri presisi saat terjadi pembalikan harga minor (pullback).
+3. Optimalisasi Kecepatan Reversion: Estimasi kecepatan pembalikan nilai rata-rata (mean reversion speed) menggunakan proses Ornstein-Uhlenbeck (OU) harus ditampilkan pada dasbor analisis web. Emiten dengan kecepatan pembalikan (a) yang tinggi wajib diprioritaskan untuk strategi pembalikan arah harian karena memberikan perputaran likuiditas modal yang lebih cepat dan efisien.
+4. Desain Infrastruktur Berkelanjutan: Mengingat karakteristik pasar BEI yang sangat dinamis, sistem pengolah data di backend platform analisis web harus diprogram untuk melakukan kalkulasi ulang (re-training) pada seluruh model klasifikasi dan regresi kointegrasi minimal sekali setiap bulan. Hal ini bertujuan untuk mencegah terjadinya penurunan akurasi akibat pergeseran rezim volatilitas pasar serta memastikan relevansi parameter optimasi teknikal dalam jangka panjang.
+Works cited
+1. (PDF) Quantitative Trading Strategy, Backtesting, and Performance Analysis Using Python: A Data-Driven Analysis - ResearchGate, https://www.researchgate.net/publication/399129762_Quantitative_Trading_Strategy_Backtesting_and_Performance_Analysis_Using_Python_A_Data-Driven_Analysis 2. Systematic Literature Review: Stock Price Prediction Using Machine Learning and Deep Learning - Atlantis Press, https://www.atlantis-press.com/article/125964959.pdf 3. The Effects of Momentum Trading, Market Volatility, and Liquidity on the Risk of Sharia Stock Portfolios in Indonesia, https://economics.pubmedia.id/index.php/jampk/article/download/958/721 4. (PDF) Analysis of Stock Trading Transactions on the Secondary Market - ResearchGate, https://www.researchgate.net/publication/360285027_Analysis_of_Stock_Trading_Transactions_on_the_Secondary_Market 5. (PDF) Comparative Performance of Statistical and LSTM Based ..., https://www.researchgate.net/publication/399220383_Comparative_Performance_of_Statistical_and_LSTM_Based_Arbitrage_in_the_Indonesian_Stock_Market 6. Predicting Market Manipulation in Stock Market using Supervised Machine Learning: A Case Study from the Indonesia Stock Exchange Unusual Market Activities, https://scholar.ui.ac.id/en/publications/predicting-market-manipulation-in-stock-market-using-supervised-m/ 7. (PDF) Optimization of investment strategies through machine learning - ResearchGate, https://www.researchgate.net/publication/370661893_Optimization_of_investment_strategies_through_machine_learning 8. COINTEGRATION ANALYSIS OF INDUSTRIAL SECTORS ON THE INDONESIA STOCK EXCHANGE: A MULTIVARIATE APPROACH - World Research Library, https://www.worldresearchlibrary.org/up_proc/pdf/1817-153880673429-33.pdf 9. Is There Any Sectoral Cointegration in Indonesia Equity Market?, https://irjbs.prasetiyamulya.ac.id/jurnalirjbs/article/view/717 10. View of Is There Any Sectoral Cointegration in Indonesia Equity Market?, https://irjbs.prasetiyamulya.ac.id/jurnalirjbs/article/view/717/198 11. Dynamic ETF Pairs Trading System Evidence From Australia, https://www.smallake.kr/wp-content/uploads/2015/11/SSRN-id2662258.pdf 12. Redalyc.Selection of a Portfolio of Pairs Based on Cointegration: A Statistical Arbitrage Strategy, https://www.redalyc.org/pdf/3058/305827591004.pdf 13. Statistical Arbitrage Strategies Using Cointegration Analysis in Cryptocurrency Markets - International Journal of Science and Research Archive, https://ijsra.net/sites/default/files/fulltext_pdf/IJSRA-2026-0283.pdf 14. Engle-Granger Cointegration Test Calculator - MetricGate, https://metricgate.com/docs/engle-granger-test/ 15. Examining Pairs Trading Profitability - Yale Department of Economics, https://economics.yale.edu/sites/default/files/2024-05/Zhu_Pairs_Trading.pdf 16. Understanding Cointegration and How to Monitor Spread Between Prices with Python | by Muhammed Burak Bedir | Medium, https://medium.com/@mburakbedir/understanding-cointegration-and-how-to-monitor-spread-between-prices-with-python-518c66c39ee4 17. Cointegration Tests - GeeksforGeeks, https://www.geeksforgeeks.org/machine-learning/cointegration-tests/ 18. Comparison of volatility and mean reversion among developed, developing and emerging countries - Emerald Publishing, https://www.emerald.com/jeas/article/41/2/470/1263999/Comparison-of-volatility-and-mean-reversion-among 19. Crypto Pairs Trading Strategy Explained: A Market-Neutral Approach - WunderTrading, https://wundertrading.com/journal/en/crypto-pairs-trading-strategy 20. PAIRS TRADING: AN EMPIRICAL STUDY Aitor Fiz, https://www.uv.es/bfc/TFM2014/001-014.pdf 21. Stocks Clustering with Fourier Transformation Towards Indonesian Stocks for Pairs Trading and Investment Diversification - AIP Publishing, https://pubs.aip.org/aip/acp/article-pdf/doi/10.1063/5.0075346/14241355/020033_1_online.pdf 22. Big Data Analysis with Momentum Strategy on Data-Driven Trading - IEEE BigDataSE-18, https://www.cloud-conf.net/ispa2021/proc/pdfs/ISPA-BDCloud-SocialCom-SustainCom2021-3mkuIWCJVSdKJpBYM7KEKW/264600b328/264600b328.pdf 23. Mean Reversion Explained - Alchemy Markets, https://alchemymarkets.com/education/strategies/mean-reversion/ 24. What is Mean Reversion Trading? - Composer.trade, https://www.composer.trade/learn/mean-reversion 25. Quant Trading with Python Using Bollinger Bands | by Judy T Raj | Medium, https://medium.com/@judytraj007/quant-trading-with-python-e334c132e5fb 26. Calculating Bollinger Band Correctly - Quantitative Finance Stack Exchange, https://quant.stackexchange.com/questions/11264/calculating-bollinger-band-correctly 27. Comparative Analysis of Vasicek, CIR, and Dothan Models for Forecasting Interest Rates and ORI Prices - Atlantis Press, https://www.atlantis-press.com/article/126014267.pdf 28. Best RSI Trading Strategy & How It Works - GTCFX, https://www.gtcfx.com/blogs/rsi-trading-strategy 29. Crash-Based Quantitative Trading Strategies: Perspective of Behavioral Finance | Request PDF - ResearchGate, https://www.researchgate.net/publication/351988155_Crash-Based_Quantitative_Trading_Strategies_Perspective_of_Behavioral_Finance 30. MOMENTUM INVESTING STRATEGY IN IDX: AN EXPERIMENT Ronald W. Liem1 UBS Indonesia ABSTRACT This research aims to test whether the - Neliti, https://media.neliti.com/media/publications/243827-none-abf67e70.pdf 31. View of Do Domestic Investors with the Smallest Trading Orders Use Momentum Strategies in The IDX? - International Research Journal of Business Studies, https://irjbs.prasetiyamulya.ac.id/index.php/jurnalirjbs/article/view/298/58 32. Do Domestic Investors with the Smallest Trading Orders Use Momentum Strategies in The IDX? - ResearchGate, https://www.researchgate.net/publication/354312318_Do_Domestic_Investors_with_the_Smallest_Trading_Orders_Use_Momentum_Strategies_in_the_IDX 33. Momentum and the Cross-section of Stock Volatility - IDEAS/RePEc, https://ideas.repec.org/a/eee/dyncon/v144y2022ics0165188922002287.html 34. The profitability of pairs trading strategies: distance, cointegration and copula methods | Request PDF - ResearchGate, https://www.researchgate.net/publication/296332425_The_profitability_of_pairs_trading_strategies_distance_cointegration_and_copula_methods 35. How an RSI + MACD Strategy on SPY Generated Zero Trades — And How AI Fixed It Into a +10.83% System | by Ntale Geofrey | Mar, 2026 - Medium, https://medium.com/@ntalegeofrey/how-an-rsi-macd-strategy-on-spy-generated-zero-trades-and-how-ai-fixed-it-into-a-10-83-system-5402cc66f4bd 36. How to Implement MACD Crossovers With Alpaca's Trading API, https://alpaca.markets/learn/how-to-implement-macd-crossovers-with-alpaca 37. A hybrid forecasting model based on deep learning feature extraction and statistical arbitrage methods for stock trading strategies - IDEAS/RePEc, https://ideas.repec.org/a/wly/jforec/v42y2023i7p1729-1749.html 38. Technical analysis testing in forecasting Socially Responsible Investment Index in Indonesia Stock Exchange - Business Perspectives, https://businessperspectives.org/index.php/component/zoo/technical-analysis-testing-in-forecasting-socially-responsible-investment-index-in-indonesia-stock-exchange 39. Rama Syaliandra — Product Leader, IDX Quant Trader & AI Builder | Jakarta, https://syaliandra.com/ 40. Catalogue and Pricelist - IDX, https://www.idx.co.id/media/qfdaszlp/idx-data-catalogue-pricelist-2023-des.pdf 41. A Hybrid ML Algorithm Trading Model combining Sentiment, Technical Indicator and Risk Management - MOST Wiedzy, https://www.mostwiedzy.pl/pl/publication/download/1/a-hybrid-ml-algorithm-trading-model-combining-sentiment-technical-indicator-and-risk-management_109512.pdf 42. STOCK MARKET PREDICTION AND ALGO- TRADING - IJRAR, https://www.ijrar.org/papers/IJRAR24D2721.pdf

@@ -99,7 +99,18 @@
         <main class="dashboard" id="dashboard" style="display: none;">
             
             <!-- Company Profile & Overview Header -->
-            <div class="overview-section glass" id="overview-card">
+            <div class="overview-section glass" id="overview-card" style="position: relative; flex-direction: column; align-items: stretch; gap: 15px;">
+                <!-- UMA Security Shield Banner -->
+                <div class="uma-shield-banner" id="uma-shield" style="display: none;">
+                    <div class="uma-shield-icon">⚠️</div>
+                    <div class="uma-shield-content">
+                        <h4>Peringatan Kuantitatif: Potensi Manipulasi Unusual Market Activity (UMA) Terdeteksi!</h4>
+                        <p id="uma-reasons">Volume transaksi dan volatilitas jangka pendek menyimpang secara ekstrem.</p>
+                    </div>
+                    <div class="uma-shield-badge"><span id="uma-prob">0%</span> Risiko</div>
+                </div>
+                
+                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; width: 100%; gap: 20px;">
                 <div class="profile-main">
                     <div class="logo-wrapper">
                         <img id="company-logo" src="" alt="Logo Perusahaan" class="company-logo">
@@ -136,6 +147,7 @@
                         </svg>
                     </div>
                     <div class="recommendation-badge" id="main-rekomendasi">HOLD</div>
+                </div>
                 </div>
             </div>
 
@@ -242,6 +254,46 @@
                                 </div>
                                 <div class="graham-status" id="altman-status" style="font-size: 11px; font-weight: bold; margin-top: 4px; text-transform: uppercase;">-</div>
                             </div>
+
+                            <!-- PCA-EVA Multi-Faktor -->
+                            <div class="valuation-sub-box" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; margin-top: 8px;">
+                                <h5 style="margin: 0 0 6px 0; color: #fff; font-size: 13px; font-weight: 600;">PCA-EVA Multi-Faktor Selection</h5>
+                                <div class="graham-row">
+                                    <span>Skor Komposit PCA:</span>
+                                    <strong id="pca-score">-</strong>
+                                </div>
+                                <div class="graham-row">
+                                    <span>Peringkat Seleksi:</span>
+                                    <strong id="pca-grade" class="badge-tag">-</strong>
+                                </div>
+                                <div class="graham-row">
+                                    <span>Nilai Tambah Ekonomi (EVA):</span>
+                                    <strong id="eva-value">-</strong>
+                                </div>
+                                <div class="graham-row">
+                                    <span>Biaya Modal (WACC):</span>
+                                    <strong id="wacc-value">-</strong>
+                                </div>
+                                <!-- Collapsible 11 PCA-EVA Indicators Table -->
+                                <button id="toggle-pca-btn" class="btn-secondary" style="width: 100%; margin-top: 8px; font-size: 11px; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">
+                                    Tampilkan Detail 11 Indikator PCA-EVA ▼
+                                </button>
+                                <div id="pca-indicators-table-box" style="display: none; margin-top: 10px; border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 8px;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left;">
+                                        <thead>
+                                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary);">
+                                                <th style="padding: 4px;">Indikator</th>
+                                                <th style="padding: 4px; text-align: right;">Nilai</th>
+                                                <th style="padding: 4px; text-align: right;">Z-Score</th>
+                                                <th style="padding: 4px; text-align: right;">Bobot PCA</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="pca-indicators-tbody">
+                                            <!-- Dynamic via JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -254,6 +306,13 @@
                     </div>
                     <div class="card-body">
                         <div class="fase-badge" id="trend-summary-badge">SIDEWAYS</div>
+                        
+                        <!-- Zero-Trade Shield Banner -->
+                        <div class="zero-trade-banner" id="zero-trade-shield-box" style="display: none; margin-bottom: 15px;">
+                            <div class="zt-status-indicator">🛡️ Zero-Trade Shield: <span id="zt-shield-status">INAKTIF</span></div>
+                            <p class="zt-details" id="zt-shield-details">Mengamati momentum tren ADX & konfirmasi RSI...</p>
+                        </div>
+                        
                         <ul class="reason-list" id="tek-alasan">
                             <!-- reasons -->
                         </ul>
@@ -294,6 +353,85 @@
                             <h4 class="section-subtitle">Candlestick & Volume</h4>
                             <div class="metrics-grid" id="tek-candlestick-vol">
                                 <!-- Candlestick, Volume, Pressures -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GA & CNN-Bi-LSTM Hybrid Forecast Card -->
+                <div class="card glass" id="hybrid-forecast-card">
+                    <div class="card-header">
+                        <h3>Model Hibrida GA-CNN-Bi-LSTM</h3>
+                        <span class="badge" id="hybrid-status-badge">AI ACTIVE</span>
+                    </div>
+                    <div class="card-body" style="padding: 18px;">
+                        <p class="card-desc-info" style="font-size: 11px; margin-bottom: 15px; color: var(--text-secondary); line-height: 1.4;">
+                            Model hibrida ini memadukan <strong>Algoritme Genetika (GA)</strong> untuk optimasi parameter dengan <strong>CNN 1D</strong> untuk ekstraksi fitur spasial dan <strong>Bidirectional LSTM</strong> untuk menangkap dependensi temporal harian secara dua arah.
+                        </p>
+                        
+                        <!-- Prediction Direction Display -->
+                        <div class="hybrid-direction-box" id="hybrid-dir-box" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 15px; border-radius: 10px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; text-align: center;">
+                            <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Arah Proyeksi Besok:</span>
+                            <strong id="hybrid-direction" style="font-size: 24px; font-family: 'Outfit', sans-serif; text-shadow: 0 0 10px rgba(255,255,255,0.15);">-</strong>
+                            <div class="hybrid-badge" id="hybrid-direction-badge" style="display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; background: rgba(255,255,255,0.08);">SIDEWAYS</div>
+                        </div>
+
+                        <!-- Target Price Range -->
+                        <div class="hybrid-targets-container" style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px;">
+                            <div class="target-sub-box glass" style="flex: 1; padding: 10px; border-radius: 8px; text-align: center; background: rgba(255,255,255,0.01);">
+                                <span style="font-size: 10px; color: var(--text-secondary); display: block; margin-bottom: 4px;">Prediksi Harga:</span>
+                                <strong id="hybrid-pred-price" style="font-size: 15px; color: #fff; font-family: monospace;">Rp 0</strong>
+                            </div>
+                            <div class="target-sub-box glass" style="flex: 1; padding: 10px; border-radius: 8px; text-align: center; background: rgba(255,255,255,0.01); border-left: 2px solid var(--accent-green);">
+                                <span style="font-size: 10px; color: var(--text-secondary); display: block; margin-bottom: 4px;">Target Atas:</span>
+                                <strong id="hybrid-high-target" style="font-size: 15px; color: var(--accent-green); font-family: monospace;">Rp 0</strong>
+                            </div>
+                            <div class="target-sub-box glass" style="flex: 1; padding: 10px; border-radius: 8px; text-align: center; background: rgba(255,255,255,0.01); border-left: 2px solid var(--accent-red);">
+                                <span style="font-size: 10px; color: var(--text-secondary); display: block; margin-bottom: 4px;">Target Bawah:</span>
+                                <strong id="hybrid-low-target" style="font-size: 15px; color: var(--accent-red); font-family: monospace;">Rp 0</strong>
+                            </div>
+                        </div>
+
+                        <!-- Confidence Gauge -->
+                        <div class="hybrid-confidence-row" style="display: flex; align-items: center; gap: 15px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 12px;">
+                            <div class="radial-gauge" style="width: 60px; height: 60px; position: relative;">
+                                <svg viewBox="0 0 36 36" class="circular-chart">
+                                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path id="hybrid-gauge-progress" class="circle" stroke="#3b82f6" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <text x="18" y="21.5" class="percentage" id="hybrid-gauge-score" style="font-size: 8px; fill: #ffffff; font-weight: 700;">0%</text>
+                                </svg>
+                            </div>
+                            <div class="confidence-info" style="display: flex; flex-direction: column; gap: 4px; font-size: 11px;">
+                                <span style="font-weight: 600; color: #fff;">Tingkat Kepercayaan Model (Confidence Score)</span>
+                                <span style="color: var(--text-secondary); line-height: 1.3;">Ditranslasikan dari kestabilan sequensial return jangka pendek yang diinput ke model Bi-LSTM.</span>
+                            </div>
+                        </div>
+
+                        <!-- GA Optimization Results -->
+                        <div class="hybrid-ga-results" style="display: flex; flex-direction: column; gap: 8px; font-size: 11px; margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-secondary);">Kromosom GA Terbaik (Best Chromosome):</span>
+                                <strong id="hybrid-best-chromosome" style="color: #fff; font-family: monospace;">N/A</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-secondary);">Nilai Fitness GA Terbaik:</span>
+                                <strong id="hybrid-fitness-score" style="color: var(--accent-yellow); font-family: monospace;">0.00</strong>
+                            </div>
+                        </div>
+
+                        <!-- Academic Proof Performance Grid -->
+                        <div class="hybrid-performance-box" style="padding: 10px; border-radius: 8px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.1); text-align: center;">
+                            <span style="font-size: 9px; color: var(--accent-blue); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px;">Peningkatan Efisiensi vs Benchmark Konvensional</span>
+                            <div style="display: flex; justify-content: space-around; gap: 10px;">
+                                <div>
+                                    <span style="font-size: 9px; color: var(--text-secondary); display: block;">Annualized Revenue:</span>
+                                    <strong id="hybrid-rev-boost" style="font-size: 13px; color: var(--accent-green);">+35.16%</strong>
+                                </div>
+                                <div style="border-left: 1px solid rgba(255,255,255,0.08);"></div>
+                                <div>
+                                    <span style="font-size: 9px; color: var(--text-secondary); display: block;">Winning Rate Boost:</span>
+                                    <strong id="hybrid-win-boost" style="font-size: 13px; color: var(--accent-green);">+15.22%</strong>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -382,6 +520,247 @@
                             <div class="sr-item"><span>S1 (Minor)</span><strong id="sr-s1">-</strong></div>
                             <div class="sr-item"><span>S2 (Strong)</span><strong id="sr-s2">-</strong></div>
                             <div class="sr-item"><span>S3 (Extreme)</span><strong id="sr-s3">-</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pairs Trading (Statistical Arbitrage) Card -->
+                <div class="card glass span-full" id="pairs-trading-card" style="display: none;">
+                    <div class="card-header">
+                        <h3>Arbitrase Statistik & Pairs Trading Sektoral</h3>
+                        <span class="badge" id="pairs-cointegrated-badge">KOINTEGRASI</span>
+                    </div>
+                    <div class="card-body pairs-body" style="padding: 18px;">
+                        <div class="pairs-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                            <!-- Left: Pairs info & instructions -->
+                            <div class="pairs-info-panel glass" style="padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 12px;">
+                                <div class="pairs-peer-row" style="display: flex; align-items: center; justify-content: center; gap: 15px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px;">
+                                    <div class="pairs-asset-badge primary" id="pairs-asset-a" style="font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; padding: 6px 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);">-</div>
+                                    <div class="pairs-versus" style="font-size: 18px; color: var(--text-secondary);">↔️</div>
+                                    <div class="pairs-asset-badge secondary" id="pairs-asset-b" style="font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #f43f5e); color: #fff; padding: 6px 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(244, 63, 94, 0.2);">-</div>
+                                </div>
+                                <div class="pairs-stat-item" style="display: flex; justify-content: space-between; font-size: 13px;">
+                                    <span>Hedge Ratio (β):</span>
+                                    <strong id="pairs-hedge-ratio" style="font-family: monospace; color: #fff;">0.0000</strong>
+                                </div>
+                                <div class="pairs-stat-item" style="display: flex; justify-content: space-between; font-size: 13px;">
+                                    <span>Persamaan Spread:</span>
+                                    <strong id="pairs-equation-str" style="font-family: monospace; color: var(--accent-yellow);">log(A) - β*log(B)</strong>
+                                </div>
+                                <div class="pairs-stat-item" style="display: flex; justify-content: space-between; font-size: 13px;">
+                                    <span>Nilai Intercept (α):</span>
+                                    <strong id="pairs-intercept" style="font-family: monospace; color: #fff;">0.0000</strong>
+                                </div>
+                                <div class="pairs-stat-item" style="display: flex; justify-content: space-between; font-size: 13px;">
+                                    <span>Co-integration P-Value:</span>
+                                    <strong id="pairs-p-value" style="font-family: monospace; color: #fff;">0.0000</strong>
+                                </div>
+                                <div class="pairs-zscore-item" style="display: flex; flex-direction: column; gap: 4px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05);">
+                                    <span style="font-size: 12px; color: var(--text-secondary);">Spread Z-Score (GARCH):</span>
+                                    <div class="pairs-zscore-value-row" style="display: flex; align-items: center; justify-content: space-between;">
+                                        <strong id="pairs-z-score" style="font-size: 24px; font-family: 'Outfit', sans-serif; color: #fff;">0.00</strong>
+                                        <span id="pairs-zscore-deviation" class="badge-tag" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.08);">Normal</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="pairs-instruction-box" style="margin-top: auto; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.04);">
+                                    <h5 style="margin: 0 0 6px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">Sinyal Eksekusi GARCH(1,1):</h5>
+                                    <div class="pairs-signal-badge" id="pairs-execution-signal" style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 6px; background: rgba(255,255,255,0.1); color: #fff;">HOLD</div>
+                                    <p id="pairs-explanation" class="pairs-explanation-text" style="margin: 0; font-size: 11px; line-height: 1.4; color: var(--text-secondary);">Menunggu peluang penyimpangan ekstrim...</p>
+                                </div>
+                            </div>
+
+                            <!-- Center: Deep LSTM Arbitrage Panel -->
+                            <div class="pairs-lstm-panel glass" style="padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 12px;">
+                                <h5 style="margin: 0; font-size: 13px; color: var(--accent-blue); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Deep Arbitrage LSTM (Model AI)</h5>
+                                <div class="pairs-stat-item" style="display: flex; justify-content: space-between; font-size: 13px;">
+                                    <span>LSTM Input:</span>
+                                    <strong style="color: #fff;">20-Day Spread Sequence</strong>
+                                </div>
+                                <div class="pairs-stat-item" style="display: flex; justify-content: space-between; font-size: 13px;">
+                                    <span>Fungsi Aktivasi:</span>
+                                    <strong style="font-family: monospace; color: var(--accent-yellow);">Sigmoid & Tanh Gates</strong>
+                                </div>
+                                <div class="pairs-stat-item" style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+                                    <span style="font-size: 12px; color: var(--text-secondary);">Probabilitas Kelas LSTM:</span>
+                                    <div id="lstm-prob-bars" style="display: flex; flex-direction: column; gap: 4px; font-size: 11px;">
+                                        <!-- Will be rendered dynamically by app.js -->
+                                    </div>
+                                </div>
+                                
+                                <div class="pairs-instruction-box" style="margin-top: auto; padding: 12px; border-radius: 8px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);">
+                                    <h5 style="margin: 0 0 6px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-blue);">Sinyal Kecerdasan Buatan (AI Recurrent):</h5>
+                                    <div class="pairs-signal-badge" id="lstm-execution-signal" style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 6px; background: #3b82f6; color: #fff; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">HOLD</div>
+                                    <p id="lstm-explanation" class="pairs-explanation-text" style="margin: 0; font-size: 11px; line-height: 1.4; color: var(--text-secondary);">AI sedang menyaring volatilitas semu...</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Right: Visual spread representation -->
+                            <div class="pairs-chart-panel glass" style="padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.01); display: flex; flex-direction: column; gap: 15px;">
+                                <h5 style="margin: 0; font-size: 13px; color: #fff; font-weight: 600;">Visualisasi Deviasi Spread & Aturan Transaksi Ritel</h5>
+                                <div class="pairs-visual-track-container" style="padding: 10px 0; margin-top: 10px;">
+                                    <div class="zscore-track" style="position: relative; height: 16px; border-radius: 8px; background: linear-gradient(to right, #f43f5e 0%, #fbbf24 30%, #10b981 40%, #10b981 60%, #fbbf24 70%, #f43f5e 100%); margin-bottom: 8px; overflow: visible; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
+                                        <!-- Dynamic Indicator Pointer Pin -->
+                                        <div class="zscore-pointer" id="zscore-pointer-pin" style="position: absolute; top: -8px; width: 2px; height: 32px; background: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.8); left: 50%; transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);">
+                                            <div class="pointer-pin" style="position: absolute; top: -4px; left: -5px; width: 12px; height: 12px; border-radius: 50%; background: #ffffff; border: 2px solid #3b82f6; box-shadow: 0 2px 4px rgba(0,0,0,0.4);"></div>
+                                            <div class="pointer-value" id="pointer-value-label" style="position: absolute; bottom: -20px; left: -18px; width: 36px; text-align: center; font-size: 9px; font-weight: 800; color: #ffffff; background: rgba(0,0,0,0.7); padding: 1px 3px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.2);">0.0</div>
+                                        </div>
+                                    </div>
+                                    <div class="zscore-labels-row" style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-secondary); font-family: monospace; padding: 0 5px;">
+                                        <span>Stop-Loss (-3.0)</span>
+                                        <span>Beli A (-2.0)</span>
+                                        <span>Exit (0.0)</span>
+                                        <span>Beli B (+2.0)</span>
+                                        <span>Stop-Loss (+3.0)</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Historic log spread visualization -->
+                                <div class="pairs-history-container" style="margin-top: 10px; flex-grow: 1; display: flex; flex-direction: column;">
+                                    <h5 style="margin: 0 0 8px 0; font-size: 12px; color: #fff; font-weight: 600;">Grafik Sparkline Log Residual Spread (20 Hari Terakhir)</h5>
+                                    <div class="pairs-sparkline" id="pairs-sparkline-canvas" style="flex-grow: 1; height: 80px; min-height: 80px; display: flex; align-items: flex-end; gap: 4px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                                        <!-- Sparkline bars are generated dynamically via app.js -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- OOS Historical Performance Comparison -->
+                        <div class="pairs-comparison-box glass" style="margin-top: 20px; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.04); overflow-x: auto;">
+                            <h5 style="margin: 0 0 10px 0; font-size: 13px; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">Komparasi Performa Historis Out-of-Sample (2021-2025)</h5>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; min-width: 600px;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary);">
+                                        <th style="padding: 6px 10px;">Model Strategi</th>
+                                        <th style="padding: 6px 10px; text-align: right;">Return Kumulatif</th>
+                                        <th style="padding: 6px 10px; text-align: right;">Rasio Sharpe</th>
+                                        <th style="padding: 6px 10px; text-align: right;">Total Eksekusi Transaksi</th>
+                                        <th style="padding: 6px 10px;">Kelebihan Utama</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                                        <td style="padding: 8px 10px; font-weight: 600;">Ekonometrika Tradisional (GARCH(1,1))</td>
+                                        <td style="padding: 8px 10px; text-align: right; color: var(--accent-yellow); font-family: monospace;">482%</td>
+                                        <td style="padding: 8px 10px; text-align: right; font-family: monospace;">0.69</td>
+                                        <td style="padding: 8px 10px; text-align: right; font-family: monospace;">61 Transaksi</td>
+                                        <td style="padding: 8px 10px; color: var(--text-secondary); font-size: 11px;">Estimasi varians kondisional adaptif terhadap guncangan pasar.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 10px; font-weight: 600; color: var(--accent-blue);">Deep Arbitrage Recurrent LSTM</td>
+                                        <td style="padding: 8px 10px; text-align: right; color: var(--accent-green); font-family: monospace; font-weight: 700;">735%</td>
+                                        <td style="padding: 8px 10px; text-align: right; color: var(--accent-green); font-family: monospace; font-weight: 700;">1.67</td>
+                                        <td style="padding: 8px 10px; text-align: right; font-family: monospace;">37 Transaksi</td>
+                                        <td style="padding: 8px 10px; color: var(--accent-green); font-size: 11px; font-weight: 500;">Filter anomali volatilitas sesaat, meminimalkan slippage & komisi ritel.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Johansen Sectoral Diversification Advisory Panel -->
+                        <div class="pairs-advisory-panel glass" style="margin-top: 15px; padding: 12px 15px; border-radius: 8px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15); display: flex; flex-direction: column; gap: 6px;">
+                            <h5 style="margin: 0; font-size: 13px; color: var(--accent-blue); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
+                                <span>💡</span> Johansen Sectoral Diversification Advisory (Rekomendasi Rotasi Sektoral)
+                            </h5>
+                            <p style="margin: 0; font-size: 11.5px; line-height: 1.5; color: var(--text-secondary);">
+                                Berdasarkan pengujian kointegrasi multivariat menggunakan <strong>Metode Johansen</strong> terhadap indeks sektoral mingguan di BEI, terbukti secara empiris bahwa <strong>tidak ada hubungan kointegrasi ekuilibrium jangka panjang yang stabil</strong> di antara sembilan indeks sektor utama dalam jangka pendek. Hal ini dipicu oleh faktor penggerak unik (idiosyncratic) pada tiap-tiap sektor emiten.
+                            </p>
+                            <div style="font-size: 11px; font-weight: 500; color: var(--accent-yellow); margin-top: 2px;">
+                                📌 <strong>Implikasi Finansial:</strong> Pembuatan portofolio wajib memanfaatkan diversifikasi sektoral aktif secara jangka pendek untuk meminimalkan risiko beta pasar secara optimal. Rotasikan alokasi modal secara berkala antar-sektor non-kointegrasi.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crash-Based Momentum & Timing Card -->
+                <div class="card glass span-full" id="crash-momentum-card" style="display: none; margin-bottom: 20px;">
+                    <div class="card-header">
+                        <h3>Model Perilaku Finansial: Crash-Based Momentum & Timing</h3>
+                        <span class="badge" id="crash-signal-badge">HOLD / STANDBY</span>
+                    </div>
+                    <div class="card-body" style="padding: 18px;">
+                        <div class="crash-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                            
+                            <!-- Left: Gauges & Probabilities -->
+                            <div class="crash-metrics-panel glass" style="padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 15px;">
+                                <h5 style="margin: 0; font-size: 13px; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Estimasi Ex-Ante Crash Probability</h5>
+                                <div style="display: flex; align-items: center; justify-content: space-around; padding: 10px 0; gap: 15px;">
+                                    <div class="radial-gauge" style="width: 100px; height: 100px; position: relative;">
+                                        <svg viewBox="0 0 36 36" class="circular-chart">
+                                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                            <path id="crash-gauge-progress" class="circle" stroke="#f43f5e" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                            <text x="18" y="21.5" class="percentage" id="crash-gauge-score" style="font-size: 8px; fill: #ffffff; font-weight: 700;">0%</text>
+                                        </svg>
+                                    </div>
+                                    <div class="crash-stats-list" style="display: flex; flex-direction: column; gap: 8px; flex-grow: 1; font-size: 12px;">
+                                        <div class="crash-stat-row" style="display: flex; justify-content: space-between;">
+                                            <span>Max Drawdown:</span>
+                                            <strong id="crash-max-dd" style="color: var(--accent-red); font-family: monospace;">0.00%</strong>
+                                        </div>
+                                        <div class="crash-stat-row" style="display: flex; justify-content: space-between;">
+                                            <span>Skewness Return:</span>
+                                            <strong id="crash-skewness" style="font-family: monospace; color: #fff;">0.000</strong>
+                                        </div>
+                                        <div class="crash-stat-row" style="display: flex; justify-content: space-between;">
+                                            <span>Excess Kurtosis:</span>
+                                            <strong id="crash-kurtosis" style="font-family: monospace; color: #fff;">0.000</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="crash-warning-details" style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+                                    <span>Fat-Tail Risk:</span> Keruncingan berlebihan (Kurtosis > 3) menunjukkan kecenderungan pergerakan harga ekstrem tak terduga yang menyimpang dari distribusi normal.
+                                </div>
+                            </div>
+                            
+                            <!-- Center: Ornstein-Uhlenbeck Stochastic Process -->
+                            <div class="crash-ou-panel glass" style="padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 15px;">
+                                <h5 style="margin: 0; font-size: 13px; color: var(--accent-green); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
+                                    <span>⏳</span> Proses Stokastik Ornstein-Uhlenbeck
+                                </h5>
+                                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12px; flex-grow: 1; justify-content: center;">
+                                    <div class="ou-stat-row" style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 6px;">
+                                        <span style="color: var(--text-secondary);">Laju Pembalikan (a):</span>
+                                        <strong id="ou-speed-a" style="font-family: monospace; color: var(--accent-green); font-size: 13px;">0.0000</strong>
+                                    </div>
+                                    <div class="ou-stat-row" style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 6px;">
+                                        <span style="color: var(--text-secondary);">Waktu Paruh (Half-Life):</span>
+                                        <strong id="ou-half-life" style="font-family: monospace; color: #fff; font-size: 13px;">- Hari</strong>
+                                    </div>
+                                    <div class="ou-stat-row" style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 6px;">
+                                        <span style="color: var(--text-secondary);">Ekuilibrium Jangka Panjang (b):</span>
+                                        <strong id="ou-mean-level" style="font-family: monospace; color: #fff; font-size: 13px;">Rp -</strong>
+                                    </div>
+                                    <div class="ou-stat-row" style="display: flex; justify-content: space-between;">
+                                        <span style="color: var(--text-secondary);">Status Reversion:</span>
+                                        <strong id="ou-status" class="badge-tag" style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; color: #fff;">-</strong>
+                                    </div>
+                                </div>
+                                <div class="ou-explainer" style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+                                    Parameter laju pembalikan <strong>a</strong> yang tinggi menunjukkan harga saham cepat kembali ke Middle Band, meminimalkan durasi transaksi ritel.
+                                </div>
+                            </div>
+                            
+                            <!-- Right: Tactical signals & Instructions -->
+                            <div class="crash-actions-panel glass" style="padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 12px;">
+                                <h5 style="margin: 0; font-size: 13px; color: var(--accent-yellow); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Sinyal Taktis & Eksekusi Portofolio</h5>
+                                
+                                <div class="crash-instruction-box" style="padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Rekomendasi Taktis Model:</span>
+                                    <strong id="crash-instruction-title" style="font-size: 16px; font-family: 'Outfit', sans-serif; color: #fff;">PERTAHANKAN POSISI PASIF (HOLD)</strong>
+                                    <div class="crash-pills-row" style="display: flex; gap: 8px; font-size: 10px; margin-top: 4px; flex-wrap: wrap;">
+                                        <span id="pill-vol-ratio" class="badge-tag" style="background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;">Vol Ratio: 1.0</span>
+                                        <span id="pill-vol-spike" class="badge-tag" style="background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;">Vol Spike: 1.0</span>
+                                        <span id="pill-rsi-current" class="badge-tag" style="background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;">RSI: 50</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">Rationale Kuantitatif Jurnal:</span>
+                                    <ul id="crash-reasons-list" class="reason-list" style="margin: 0; font-size: 11px; padding-left: 0; display: flex; flex-direction: column; gap: 4px;">
+                                        <!-- Dynamic via JS -->
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

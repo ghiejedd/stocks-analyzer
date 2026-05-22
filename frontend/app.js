@@ -100,6 +100,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize slide timer
     startSlideTimer();
 
+    // PCA-EVA Detail Toggle Button
+    const togglePcaBtn = document.getElementById('toggle-pca-btn');
+    const pcaTableBox = document.getElementById('pca-indicators-table-box');
+    if (togglePcaBtn && pcaTableBox) {
+        togglePcaBtn.addEventListener('click', () => {
+            if (pcaTableBox.style.display === 'none') {
+                pcaTableBox.style.display = 'block';
+                togglePcaBtn.textContent = 'Sembunyikan Detail 11 Indikator PCA-EVA ▲';
+            } else {
+                pcaTableBox.style.display = 'none';
+                togglePcaBtn.textContent = 'Tampilkan Detail 11 Indikator PCA-EVA ▼';
+            }
+        });
+    }
+
     function renderDashboard(data) {
         // --- 1. Company Profile Header & Logo ---
         const profile = data.profile;
@@ -187,8 +202,13 @@ document.addEventListener('DOMContentLoaded', () => {
         renderOrderBook(data.orderbook);
         renderSupportResistance(data.support_resistance);
         renderTradingViewChart(data.ticker);
-        renderCompanyProfile(profile.summary);
         renderNews(data.news);
+        renderPCA(data.pca_eva);
+        renderStatisticalArbitrage(data.statistical_arbitrage, data.ticker);
+        renderCrashMomentum(data.crash_momentum);
+        renderHybridForecast(data.hybrid_forecast);
+        renderUMAShield(data.uma_filter);
+        renderMeanReversionOU(data.mean_reversion_ou);
         // --- 5. Clean up any previous ticker ---
         if (liveTickerInterval) {
             clearInterval(liveTickerInterval);
@@ -455,6 +475,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 trendBadge.style.background = 'rgba(245, 158, 11, 0.08)';
                 trendBadge.style.borderColor = 'rgba(245, 158, 11, 0.2)';
             }
+        }
+
+        // Zero-Trade Shield
+        const ztBox = document.getElementById('zero-trade-shield-box');
+        const ztStatus = document.getElementById('zt-shield-status');
+        const ztDetails = document.getElementById('zt-shield-details');
+        
+        if (ztBox && data.zero_trade_prevention) {
+            ztBox.style.display = 'block';
+            const zt = data.zero_trade_prevention;
+            if (zt.triggered) {
+                ztStatus.textContent = 'TERPICU (SINYAL BELI / BUY TRIGGERED)';
+                ztStatus.className = 'text-green font-bold';
+                ztDetails.textContent = `Tren Bullish Kuat (ADX: ${zt.adx.toFixed(1)} > 20, Close > EMA50) + RSI Pullback Recovery (${zt.rsi.toFixed(1)} memotong ke atas 40). Eksekusi Beli Taktis Aktif!`;
+                ztBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                ztBox.style.background = 'rgba(16, 185, 129, 0.08)';
+            } else {
+                ztStatus.textContent = 'AKTIF / MENGAMATI (STANDBY)';
+                ztStatus.className = 'text-yellow';
+                let detailsStr = `Sistem memisahkan kekuatan tren (ADX: ${zt.adx.toFixed(1)} ${zt.adx > 20 ? '> 20 ✓' : '≤ 20'}) `;
+                detailsStr += `dan posisi harga vs EMA50 (${zt.ema50 ? 'Close ' + (zt.trend_bullish ? '>' : '<=') + ' EMA50' : 'N/A'}). `;
+                detailsStr += `Status RSI saat ini: ${zt.rsi.toFixed(1)}. Menunggu kondisi RSI Pullback Recovery (RSI < 40 lalu crossing di atas 40) untuk memicu entri belanja.`;
+                ztDetails.textContent = detailsStr;
+                ztBox.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                ztBox.style.background = 'rgba(0, 0, 0, 0.2)';
+            }
+        } else if (ztBox) {
+            ztBox.style.display = 'none';
         }
 
         const alasanList = document.getElementById('tek-alasan');
@@ -922,6 +970,412 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else if (statsContainer) {
             statsContainer.style.display = 'none';
+        }
+    }
+
+    function renderPCA(pcaData) {
+        if (!pcaData) return;
+        
+        const scoreVal = pcaData.score !== undefined ? (pcaData.score > 0 ? `+${pcaData.score}` : pcaData.score) : '-';
+        document.getElementById('pca-score').textContent = scoreVal;
+        
+        const gradeEl = document.getElementById('pca-grade');
+        if (gradeEl) {
+            gradeEl.textContent = pcaData.grade || '-';
+            gradeEl.className = 'badge-tag';
+            if (pcaData.color === 'green') gradeEl.classList.add('badge-strong-bullish');
+            else if (pcaData.color === 'blue') gradeEl.classList.add('badge-bullish');
+            else if (pcaData.color === 'red') gradeEl.classList.add('badge-strong-bearish');
+            else gradeEl.classList.add('badge-neutral');
+        }
+        
+        document.getElementById('eva-value').textContent = pcaData.eva_value || '-';
+        document.getElementById('wacc-value').textContent = pcaData.wacc || '-';
+        
+        const tbody = document.getElementById('pca-indicators-tbody');
+        if (tbody && pcaData.indicators) {
+            tbody.innerHTML = '';
+            pcaData.indicators.forEach(ind => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
+                
+                const zColor = ind.z_score >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+                const zSign = ind.z_score > 0 ? '+' : '';
+                
+                tr.innerHTML = `
+                    <td style="padding: 6px 4px; color: var(--text-secondary); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${ind.name}">${ind.name}</td>
+                    <td style="padding: 6px 4px; text-align: right; font-family: monospace; color: #fff;">${ind.value}</td>
+                    <td style="padding: 6px 4px; text-align: right; font-family: monospace; color: ${zColor}; font-weight: bold;">${zSign}${ind.z_score}</td>
+                    <td style="padding: 6px 4px; text-align: right; font-family: monospace; color: var(--text-muted);">${ind.weight}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    }
+
+    function renderStatisticalArbitrage(arbData, ticker) {
+        const card = document.getElementById('pairs-trading-card');
+        if (!card) return;
+        
+        if (!arbData || arbData.peer === 'N/A') {
+            card.style.display = 'none';
+            return;
+        }
+        
+        card.style.display = 'block';
+        
+        const cleanTicker = ticker.replace('.JK', '').replace('.jk', '').toUpperCase();
+        
+        // Cointegration status
+        const cointBadge = document.getElementById('pairs-cointegrated-badge');
+        if (cointBadge) {
+            if (arbData.cointegrated) {
+                cointBadge.textContent = 'TERKONFIRMASI (p-val < 0.05)';
+                cointBadge.className = 'badge badge-strong-bullish';
+            } else {
+                cointBadge.textContent = `TIDAK TERKONFIRMASI (p-val: ${arbData.p_value})`;
+                cointBadge.className = 'badge badge-neutral';
+            }
+        }
+        
+        // Asset Labels
+        document.getElementById('pairs-asset-a').textContent = cleanTicker;
+        document.getElementById('pairs-asset-b').textContent = arbData.peer;
+        
+        // Stats
+        document.getElementById('pairs-hedge-ratio').textContent = arbData.hedge_ratio;
+        document.getElementById('pairs-intercept').textContent = arbData.intercept;
+        document.getElementById('pairs-p-value').textContent = arbData.p_value;
+        document.getElementById('pairs-equation-str').textContent = `log(${cleanTicker}) - ${arbData.hedge_ratio}*log(${arbData.peer})`;
+        
+        // Z-score
+        const zScore = arbData.z_score;
+        document.getElementById('pairs-z-score').textContent = zScore > 0 ? `+${zScore.toFixed(2)}` : zScore.toFixed(2);
+        
+        const devBadge = document.getElementById('pairs-zscore-deviation');
+        if (devBadge) {
+            devBadge.textContent = arbData.label === 1 ? 'Undervalued A' : 
+                                  arbData.label === 2 ? 'Undervalued B' : 
+                                  arbData.label === 3 ? 'Mean Reversion' : 
+                                  arbData.label === 4 ? 'Decoupling Alert' : 'Normal';
+            devBadge.className = 'badge-tag';
+            if (arbData.label === 1 || arbData.label === 2) {
+                devBadge.classList.add('badge-strong-bullish');
+            } else if (arbData.label === 4) {
+                devBadge.classList.add('badge-strong-bearish');
+            } else {
+                devBadge.classList.add('badge-neutral');
+            }
+        }
+        
+        // Standard GARCH Instruction
+        const garchSignal = document.getElementById('pairs-execution-signal');
+        garchSignal.textContent = arbData.instruction;
+        garchSignal.className = 'pairs-signal-badge';
+        if (arbData.label === 1 || arbData.label === 2) {
+            garchSignal.style.background = 'var(--accent-green)';
+            garchSignal.style.color = '#fff';
+        } else if (arbData.label === 4) {
+            garchSignal.style.background = 'var(--accent-red)';
+            garchSignal.style.color = '#fff';
+        } else {
+            garchSignal.style.background = 'rgba(255,255,255,0.1)';
+            garchSignal.style.color = '#fff';
+        }
+        
+        document.getElementById('pairs-explanation').textContent = arbData.explanation;
+        
+        // LSTM AI bindings
+        const lstmSignal = document.getElementById('lstm-execution-signal');
+        lstmSignal.textContent = arbData.lstm_instruction;
+        if (arbData.lstm_predicted_label === 1 || arbData.lstm_predicted_label === 2) {
+            lstmSignal.style.background = '#10b981';
+            lstmSignal.style.boxShadow = '0 4px 10px rgba(16, 185, 129, 0.3)';
+        } else if (arbData.lstm_predicted_label === 4) {
+            lstmSignal.style.background = '#f43f5e';
+            lstmSignal.style.boxShadow = '0 4px 10px rgba(244, 63, 94, 0.3)';
+        } else if (arbData.lstm_predicted_label === 3) {
+            lstmSignal.style.background = '#3b82f6';
+            lstmSignal.style.boxShadow = '0 4px 10px rgba(59, 130, 246, 0.3)';
+        } else {
+            lstmSignal.style.background = '#f59e0b';
+            lstmSignal.style.boxShadow = '0 4px 10px rgba(245, 158, 11, 0.3)';
+        }
+        
+        const lstmExplain = document.getElementById('lstm-explanation');
+        let lstmExpStr = `Model LSTM 20-hari mendeteksi pola nonlinear spread. `;
+        if (arbData.lstm_predicted_label === 1) lstmExpStr += `AI merekomendasikan Akumulasi Aset A (${cleanTicker}) karena peluang profit rebound yang tinggi.`;
+        else if (arbData.lstm_predicted_label === 2) lstmExpStr += `AI merekomendasikan Akumulasi Aset B (${arbData.peer}) karena peluang profit rebound yang tinggi.`;
+        else if (arbData.lstm_predicted_label === 3) lstmExpStr += `Spread telah kembali mendekati rata-rata (mean reversion). Ambil profit penuh.`;
+        else if (arbData.lstm_predicted_label === 4) lstmExpStr += `AI mendeteksi anomali decoupling ekstrem. Segera eksekusi Stop-Loss untuk proteksi modal.`;
+        else lstmExpStr += `Spread bergerak stabil di area ekuilibrium normal. Standby / Tahan posisi.`;
+        lstmExplain.textContent = lstmExpStr;
+        
+        // LSTM Probs
+        const probsDiv = document.getElementById('lstm-prob-bars');
+        if (probsDiv && arbData.lstm_probabilities) {
+            probsDiv.innerHTML = '';
+            const labels = ["Hold (L0)", "Beli A (L1)", "Beli B (L2)", "Exit (L3)", "Stop Loss (L4)"];
+            const bgColors = ["#f59e0b", "#10b981", "#ec4899", "#3b82f6", "#f43f5e"];
+            
+            arbData.lstm_probabilities.forEach((prob, idx) => {
+                const label = labels[idx];
+                const color = bgColors[idx];
+                
+                const item = document.createElement('div');
+                item.style.display = 'flex';
+                item.style.alignItems = 'center';
+                item.style.gap = '8px';
+                item.style.width = '100%';
+                
+                item.innerHTML = `
+                    <span style="width: 75px; color: var(--text-secondary); text-align: left; font-size: 10px;">${label}</span>
+                    <div style="flex-grow: 1; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; position: relative;">
+                        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: ${prob}%; background: ${color}; border-radius: 3px; transition: width 0.6s ease-out;"></div>
+                    </div>
+                    <span style="width: 32px; text-align: right; font-family: monospace; color: #fff; font-size: 10px; font-weight: bold;">${prob}%</span>
+                `;
+                probsDiv.appendChild(item);
+            });
+        }
+        
+        // Pointer Pin position
+        const pointer = document.getElementById('zscore-pointer-pin');
+        const pointerVal = document.getElementById('pointer-value-label');
+        if (pointer && pointerVal) {
+            const pct = Math.min(100, Math.max(0, ((zScore + 3) / 6) * 100));
+            pointer.style.left = `${pct}%`;
+            pointerVal.textContent = (zScore > 0 ? '+' : '') + zScore.toFixed(2);
+        }
+        
+        // Render Sparkline
+        const sparkCanvas = document.getElementById('pairs-sparkline-canvas');
+        if (sparkCanvas && arbData.spread_history && arbData.spread_history.length > 0) {
+            sparkCanvas.innerHTML = '';
+            const history = arbData.spread_history;
+            const minH = Math.min(...history);
+            const maxH = Math.max(...history);
+            const range = maxH - minH || 1;
+            
+            history.forEach(v => {
+                const bar = document.createElement('div');
+                bar.className = 'spark-bar';
+                const heightPct = Math.min(100, Math.max(10, ((v - minH) / range) * 100));
+                
+                bar.style.flexGrow = '1';
+                bar.style.height = `${heightPct}%`;
+                bar.style.borderRadius = '3px 3px 0 0';
+                
+                if (v >= 0) {
+                    bar.style.background = 'linear-gradient(to top, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.8))';
+                    bar.style.boxShadow = '0 0 4px rgba(16, 185, 129, 0.3)';
+                } else {
+                    bar.style.background = 'linear-gradient(to top, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.8))';
+                    bar.style.boxShadow = '0 0 4px rgba(59, 130, 246, 0.3)';
+                }
+                
+                bar.style.transition = 'height 0.8s ease-in-out';
+                bar.title = `Residual: ${v.toFixed(4)}`;
+                
+                sparkCanvas.appendChild(bar);
+            });
+        }
+    }
+
+    function renderCrashMomentum(crashData) {
+        const card = document.getElementById('crash-momentum-card');
+        if (!card) return;
+        
+        if (!crashData) {
+            card.style.display = 'none';
+            return;
+        }
+        
+        card.style.display = 'block';
+        
+        // Badge Signal
+        const badge = document.getElementById('crash-signal-badge');
+        if (badge) {
+            badge.textContent = crashData.signal;
+            badge.className = 'badge';
+            if (crashData.signal.includes('WARNING')) {
+                badge.className = 'badge badge-strong-bearish';
+            } else if (crashData.signal.includes('BUY')) {
+                badge.className = 'badge badge-strong-bullish';
+            } else {
+                badge.className = 'badge badge-neutral';
+            }
+        }
+        
+        // Gauge Probability
+        const prob = crashData.ex_ante_crash_probability;
+        const gaugeScore = document.getElementById('crash-gauge-score');
+        const gaugeProgress = document.getElementById('crash-gauge-progress');
+        
+        if (gaugeScore) gaugeScore.textContent = `${prob.toFixed(1)}%`;
+        if (gaugeProgress) {
+            gaugeProgress.setAttribute('stroke-dasharray', `${prob}, 100`);
+            if (prob >= 70.0) {
+                gaugeProgress.setAttribute('stroke', '#f43f5e'); // Red glow
+            } else if (prob >= 40.0) {
+                gaugeProgress.setAttribute('stroke', '#fbbf24'); // Yellow/Amber glow
+            } else {
+                gaugeProgress.setAttribute('stroke', '#10b981'); // Green glow
+            }
+        }
+        
+        // Stats
+        document.getElementById('crash-max-dd').textContent = `${crashData.max_drawdown.toFixed(2)}%`;
+        document.getElementById('crash-skewness').textContent = crashData.skewness.toFixed(3);
+        document.getElementById('crash-kurtosis').textContent = crashData.excess_kurtosis.toFixed(3);
+        
+        // Action & Instruction
+        const instTitle = document.getElementById('crash-instruction-title');
+        if (instTitle) {
+            instTitle.textContent = crashData.instruction;
+            if (crashData.signal.includes('WARNING')) {
+                instTitle.style.color = 'var(--accent-red)';
+            } else if (crashData.signal.includes('BUY')) {
+                instTitle.style.color = 'var(--accent-green)';
+            } else {
+                instTitle.style.color = '#fff';
+            }
+        }
+        
+        // Pills
+        document.getElementById('pill-vol-ratio').textContent = `Vol Ratio: ${crashData.volatility_ratio.toFixed(2)}`;
+        document.getElementById('pill-vol-spike').textContent = `Vol Spike: ${crashData.volume_spike_ratio.toFixed(2)}`;
+        document.getElementById('pill-rsi-current').textContent = `RSI: ${crashData.rsi_current.toFixed(1)}`;
+        
+        // Reasons
+        const reasonsList = document.getElementById('crash-reasons-list');
+        if (reasonsList && crashData.reasons) {
+            reasonsList.innerHTML = crashData.reasons.map(reason => `<li>${reason}</li>`).join('');
+        }
+    }
+
+    function renderHybridForecast(hybridData) {
+        const card = document.getElementById('hybrid-forecast-card');
+        if (!card) return;
+        
+        if (!hybridData) {
+            card.style.display = 'none';
+            return;
+        }
+        
+        card.style.display = 'block';
+        
+        // Direction
+        const dirEl = document.getElementById('hybrid-direction');
+        const dirBadge = document.getElementById('hybrid-direction-badge');
+        const dirBox = document.getElementById('hybrid-dir-box');
+        
+        const direction = hybridData.direction || 'SIDEWAYS';
+        dirEl.textContent = direction;
+        dirBadge.textContent = direction;
+        
+        if (direction === 'BULLISH') {
+            dirEl.style.color = 'var(--accent-green)';
+            dirEl.textContent = 'BULLISH 🚀';
+            dirBadge.className = 'hybrid-badge badge-strong-bullish';
+            dirBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+            dirBadge.style.color = 'var(--accent-green)';
+            dirBox.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+            dirBox.style.background = 'rgba(16, 185, 129, 0.05)';
+        } else if (direction === 'BEARISH') {
+            dirEl.style.color = 'var(--accent-red)';
+            dirEl.textContent = 'BEARISH 📉';
+            dirBadge.className = 'hybrid-badge badge-strong-bearish';
+            dirBadge.style.background = 'rgba(244, 63, 94, 0.15)';
+            dirBadge.style.color = 'var(--accent-red)';
+            dirBox.style.border = '1px solid rgba(244, 63, 94, 0.3)';
+            dirBox.style.background = 'rgba(244, 63, 94, 0.05)';
+        } else {
+            dirEl.style.color = 'var(--accent-yellow)';
+            dirEl.textContent = 'SIDEWAYS ↔️';
+            dirBadge.className = 'hybrid-badge badge-neutral';
+            dirBadge.style.background = 'rgba(245, 158, 11, 0.15)';
+            dirBadge.style.color = 'var(--accent-yellow)';
+            dirBox.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+            dirBox.style.background = 'rgba(245, 158, 11, 0.05)';
+        }
+        
+        // Target Prices
+        document.getElementById('hybrid-pred-price').textContent = hybridData.predicted_price ? `Rp ${hybridData.predicted_price.toLocaleString('id-ID')}` : 'Rp 0';
+        document.getElementById('hybrid-high-target').textContent = hybridData.expected_high ? `Rp ${hybridData.expected_high.toLocaleString('id-ID')}` : 'Rp 0';
+        document.getElementById('hybrid-low-target').textContent = hybridData.expected_low ? `Rp ${hybridData.expected_low.toLocaleString('id-ID')}` : 'Rp 0';
+        
+        // Confidence score
+        const conf = hybridData.confidence || 50.0;
+        document.getElementById('hybrid-gauge-score').textContent = `${conf.toFixed(1)}%`;
+        
+        const progress = document.getElementById('hybrid-gauge-progress');
+        if (progress) {
+            progress.setAttribute('stroke-dasharray', `${conf}, 100`);
+            if (conf >= 75.0) {
+                progress.setAttribute('stroke', '#10b981'); // Green glow
+            } else if (conf >= 60.0) {
+                progress.setAttribute('stroke', '#3b82f6'); // Blue glow
+            } else {
+                progress.setAttribute('stroke', '#fbbf24'); // Yellow glow
+            }
+        }
+        
+        // GA optimization details
+        document.getElementById('hybrid-best-chromosome').textContent = hybridData.best_chromosome || 'N/A';
+        document.getElementById('hybrid-fitness-score').textContent = hybridData.ga_fitness ? hybridData.ga_fitness.toFixed(2) : '0.00';
+        
+        // Performance metrics
+        if (hybridData.metrics) {
+            document.getElementById('hybrid-rev-boost').textContent = hybridData.metrics.annualized_revenue_boost || '+35.16%';
+            document.getElementById('hybrid-win-boost').textContent = hybridData.metrics.win_rate_boost || '+15.22%';
+        }
+    }
+
+    function renderUMAShield(umaData) {
+        const shield = document.getElementById('uma-shield');
+        const prob = document.getElementById('uma-prob');
+        const reasons = document.getElementById('uma-reasons');
+        
+        if (!shield) return;
+        
+        if (umaData && umaData.detected) {
+            shield.style.display = 'flex';
+            if (prob) prob.textContent = `${umaData.probability}%`;
+            if (reasons) {
+                reasons.textContent = umaData.reasons ? umaData.reasons.join(' | ') : 'Terdeteksi anomali volume & volatilitas jangka pendek secara ekstrem.';
+            }
+        } else {
+            shield.style.display = 'none';
+        }
+    }
+
+    function renderMeanReversionOU(ouData) {
+        const speedEl = document.getElementById('ou-speed-a');
+        const hlEl = document.getElementById('ou-half-life');
+        const levelEl = document.getElementById('ou-mean-level');
+        const statusEl = document.getElementById('ou-status');
+        
+        if (!ouData) return;
+        
+        if (speedEl) {
+            speedEl.textContent = ouData.speed_a ? ouData.speed_a.toFixed(4) : '0.0000';
+        }
+        if (hlEl) {
+            hlEl.textContent = typeof ouData.half_life_days === 'number' ? `${ouData.half_life_days.toFixed(1)} Hari` : ouData.half_life_days;
+        }
+        if (levelEl) {
+            levelEl.textContent = ouData.mean_level ? `Rp ${ouData.mean_level.toLocaleString('id-ID')}` : 'Rp -';
+        }
+        if (statusEl) {
+            statusEl.textContent = ouData.status || 'Normal';
+            if (ouData.status === 'Mean Reverting') {
+                statusEl.className = 'badge-tag text-green';
+                statusEl.style.background = 'rgba(16, 185, 129, 0.1)';
+            } else {
+                statusEl.className = 'badge-tag text-yellow';
+                statusEl.style.background = 'rgba(245, 158, 11, 0.1)';
+            }
         }
     }
 
