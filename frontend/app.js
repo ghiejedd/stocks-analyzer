@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 img.style.opacity = '1';
-                wrapper.style.background = '#ffffff'; // White container for real logos
+                wrapper.style.background = 'transparent'; // Keep background transparent for a premium look
             };
             
             img.onerror = () => {
