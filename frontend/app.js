@@ -31,11 +31,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await fetch(`/api/analyze/${ticker}`);
-            const data = await response.json();
-
+            
             if (!response.ok) {
-                throw new Error(data.detail || 'Terjadi kesalahan saat mengambil data');
+                let errorMsg = 'Terjadi kesalahan saat mengambil data';
+                try {
+                    const errData = await response.json();
+                    errorMsg = errData.detail || errorMsg;
+                } catch (e) {
+                    try {
+                        const rawText = await response.text();
+                        if (rawText && rawText.length < 200) {
+                            errorMsg = rawText;
+                        }
+                    } catch (textErr) {}
+                }
+                throw new Error(errorMsg);
             }
+
+            const data = await response.json();
 
             // Small delay to make shimmer skeleton feel premium
             setTimeout(() => {

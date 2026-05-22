@@ -4,3 +4,4 @@ yfinance
 pandas
 feedparser
 requests
+statsmodels
