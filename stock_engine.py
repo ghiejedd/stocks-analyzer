@@ -1947,7 +1947,34 @@ def check_statistical_arbitrage(prices_a, ticker_a):
             
         ticker_b_full = f"{ticker_b}.JK"
         saham_b = yf.Ticker(ticker_b_full)
-        data_b = saham_b.history(period="6mo")
+        try:
+            data_b = saham_b.history(period="6mo")
+        except Exception:
+            data_b = pd.DataFrame()
+            
+        if data_b.empty:
+            try:
+                url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker_b_full}?range=6mo&interval=1d"
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                }
+                r = requests.get(url, headers=headers, timeout=10)
+                if r.status_code == 200:
+                    res = r.json().get('chart', {}).get('result', [])[0]
+                    timestamps = res.get('timestamp', [])
+                    indicators = res.get('indicators', {}).get('quote', [])[0]
+                    
+                    data_b = pd.DataFrame({
+                        'Open': indicators.get('open'),
+                        'High': indicators.get('high'),
+                        'Low': indicators.get('low'),
+                        'Close': indicators.get('close'),
+                        'Volume': indicators.get('volume')
+                    }, index=pd.to_datetime(timestamps, unit='s', utc=True))
+                    data_b.index.name = 'Date'
+                    data_b = data_b.dropna(subset=['Close'])
+            except Exception as chart_err:
+                print(f"Chart fallback for peer failed: {chart_err}")
         
         if data_b.empty:
             return {

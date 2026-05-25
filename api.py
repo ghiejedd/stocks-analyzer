@@ -62,7 +62,37 @@ def analyze_stock(ticker: str):
             ticker = f"{ticker}.JK"
             
         saham = yf.Ticker(ticker)
-        data = saham.history(period="6mo")
+        try:
+            data = saham.history(period="6mo")
+        except Exception:
+            data = pd.DataFrame()
+            
+        if data.empty:
+            # Direct JSON chart fallback to bypass IP rate limits on Render
+            try:
+                import pandas as pd
+                url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?range=6mo&interval=1d"
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                }
+                r = requests.get(url, headers=headers, timeout=10)
+                if r.status_code == 200:
+                    res = r.json().get('chart', {}).get('result', [])[0]
+                    timestamps = res.get('timestamp', [])
+                    indicators = res.get('indicators', {}).get('quote', [])[0]
+                    
+                    data = pd.DataFrame({
+                        'Open': indicators.get('open'),
+                        'High': indicators.get('high'),
+                        'Low': indicators.get('low'),
+                        'Close': indicators.get('close'),
+                        'Volume': indicators.get('volume')
+                    }, index=pd.to_datetime(timestamps, unit='s', utc=True))
+                    data.index.name = 'Date'
+                    # Drop any NaN rows that Yahoo sometimes returns for current day pre-market
+                    data = data.dropna(subset=['Close'])
+            except Exception as chart_err:
+                print(f"Chart fallback failed: {chart_err}")
         
         if data.empty:
             raise HTTPException(status_code=404, detail="Data saham tidak ditemukan. Pastikan kode saham valid (contoh: BBCA, TLKM).")
