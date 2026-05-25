@@ -175,14 +175,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Composite Target Price Rendering
         const targetPrice = data.target_price;
         const targetEl = document.getElementById('stock-target-price');
-        if (targetPrice && targetPrice > 0 && price) {
+        if (targetPrice && targetPrice > 0) {
             targetEl.textContent = `Target: Rp ${targetPrice.toLocaleString('id-ID')}`;
             targetEl.style.display = 'inline-flex';
-            if (targetPrice > price) {
+            
+            const cmpPrice = price || 0;
+            if (cmpPrice > 0 && targetPrice > cmpPrice) {
                 targetEl.style.color = 'var(--accent-green)';
                 targetEl.style.background = 'rgba(16, 185, 129, 0.08)';
                 targetEl.style.border = '1px solid rgba(16, 185, 129, 0.25)';
-            } else if (targetPrice < price) {
+            } else if (cmpPrice > 0 && targetPrice < cmpPrice) {
                 targetEl.style.color = 'var(--accent-red)';
                 targetEl.style.background = 'rgba(244, 63, 94, 0.08)';
                 targetEl.style.border = '1px solid rgba(244, 63, 94, 0.25)';

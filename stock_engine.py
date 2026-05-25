@@ -82,7 +82,14 @@ def get_fundamental(saham, kode):
         avg_vol = safe_get(info, 'averageVolume')
         hi52 = safe_get(info, 'fiftyTwoWeekHigh')
         lo52 = safe_get(info, 'fiftyTwoWeekLow')
-        price = safe_get(info, 'currentPrice') or safe_get(info, 'regularMarketPrice')
+        price = safe_get(info, 'currentPrice') or safe_get(info, 'regularMarketPrice') or safe_get(info, 'previousClose')
+        if not price or pd.isna(price) or price == 0:
+            try:
+                hist = saham.history(period="1d")
+                if not hist.empty:
+                    price = float(hist['Close'].iloc[-1])
+            except Exception:
+                pass
 
         skor = 0
         alasan = []
