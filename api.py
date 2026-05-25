@@ -10,14 +10,7 @@ import numpy as np
 import traceback
 import requests
 
-# Reusable modern browser requests session to prevent yfinance rate limits (HTTP 429)
-yf_session = requests.Session()
-yf_session.headers.update({
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Connection': 'keep-alive'
-})
+
 
 # Custom JSON encoder that handles numpy types for all Python/numpy versions
 class NumpySafeEncoder(json.JSONEncoder):
@@ -68,7 +61,7 @@ def analyze_stock(ticker: str):
         if not ticker.endswith('.JK') and not '.' in ticker:
             ticker = f"{ticker}.JK"
             
-        saham = yf.Ticker(ticker, session=yf_session)
+        saham = yf.Ticker(ticker)
         data = saham.history(period="6mo")
         
         if data.empty:

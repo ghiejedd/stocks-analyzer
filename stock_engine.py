@@ -12,14 +12,7 @@ from datetime import datetime, timezone
 
 warnings.filterwarnings('ignore')
 
-# Reusable modern browser requests session to prevent yfinance rate limits (HTTP 429)
-yf_session = requests.Session()
-yf_session.headers.update({
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Connection': 'keep-alive'
-})
+
 
 BROKER_ASING = ['AK', 'BK', 'ZP', 'CS', 'ML', 'DB', 'JP', 'UB', 'GS', 'MS']
 BROKER_LOKAL = ['YP', 'RX', 'PD', 'DX', 'MG', 'KZ', 'TP', 'AI', 'BZ', 'KI']
@@ -1953,7 +1946,7 @@ def check_statistical_arbitrage(prices_a, ticker_a):
             ticker_b = "BBRI" if clean_a != "BBRI" else "BBCA"
             
         ticker_b_full = f"{ticker_b}.JK"
-        saham_b = yf.Ticker(ticker_b_full, session=yf_session)
+        saham_b = yf.Ticker(ticker_b_full)
         data_b = saham_b.history(period="6mo")
         
         if data_b.empty:
