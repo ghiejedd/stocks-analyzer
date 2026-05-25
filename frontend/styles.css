@@ -377,6 +377,29 @@ body {
     display: inline-block;
 }
 
+.target-price-display {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-left: 8px;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: all 0.3s ease;
+}
+
+@keyframes neonFlash {
+    0% { text-shadow: 0 0 0px transparent; }
+    50% { text-shadow: 0 0 12px var(--accent-green); }
+    100% { text-shadow: 0 0 0px transparent; }
+}
+
+.price-flash {
+    animation: neonFlash 0.5s ease-out;
+}
+
 .last-updated {
     font-size: 11px;
     color: var(--text-muted);

@@ -205,10 +205,76 @@ def analyze_stock(ticker: str):
                 "metrics": {"annualized_revenue_boost": "+35.16%", "win_rate_boost": "+15.22%"}
             }
         
+        # === Composite Target Price Calculation ===
+        target_components = []
+        
+        # 1. DCF target (weight 35%)
+        try:
+            dcf_str = fund_data.get('valuasi', {}).get('dcf_val', 'N/A')
+            if dcf_str and dcf_str != 'N/A':
+                dcf_num = float(dcf_str.replace('Rp', '').replace(',', '').replace(' ', '').strip())
+                if dcf_num > 0:
+                    target_components.append((dcf_num, 0.35))
+        except Exception:
+            pass
+            
+        # 2. Graham target (weight 15%)
+        try:
+            graham_str = fund_data.get('valuasi', {}).get('graham_val', 'N/A')
+            if graham_str and graham_str != 'N/A':
+                graham_num = float(graham_str.replace('Rp', '').replace(',', '').replace(' ', '').strip())
+                if graham_num > 0:
+                    target_components.append((graham_num, 0.15))
+        except Exception:
+            pass
+            
+        # 3. Hybrid CNN-Bi-LSTM Neural Target (weight 30%)
+        try:
+            lstm_num = hybrid_forecast_data.get('predicted_price', 0.0) or 0.0
+            if lstm_num > 0:
+                target_components.append((lstm_num, 0.30))
+        except Exception:
+            pass
+            
+        # 4. Ornstein-Uhlenbeck Mean Reversion Target (weight 20%)
+        try:
+            ou_level = ou_data.get('mean_level', 0.0) or 0.0
+            if ou_level > 0 and ou_data.get('status') == 'Mean Reverting':
+                target_components.append((ou_level, 0.20))
+        except Exception:
+            pass
+            
+        # Weighted composite or technical fallback
+        current_price = fund_data.get('market_info', {}).get('price') or float(data['Close'].iloc[-1])
+        composite_target = 0.0
+        
+        if target_components:
+            total_weight = sum(w for _, w in target_components)
+            weighted_sum = sum(val * w for val, w in target_components)
+            composite_target = weighted_sum / total_weight
+        else:
+            # Technical target fallback
+            r1 = sr_data.get('r1')
+            r2 = sr_data.get('r2')
+            if r1 and r1 > current_price:
+                composite_target = r1
+            elif r2 and r2 > current_price:
+                composite_target = r2
+            else:
+                composite_target = current_price * 1.10
+                
+        # Limit target price to +/- 50% of current price to avoid math anomalies
+        if current_price > 0:
+            min_allowed = current_price * 0.5
+            max_allowed = current_price * 1.5
+            composite_target = max(min_allowed, min(max_allowed, composite_target))
+            composite_target = round(composite_target, 0)
+
         result = {
             "ticker": ticker,
             "rekomendasi": rekom,
             "total_skor": total_skor,
+            "target_price": composite_target,
             "profile": profile_data,
             "news": news_data,
             "fundamental": fund_data,
@@ -234,6 +300,64 @@ def analyze_stock(ticker: str):
         tb_str = traceback.format_exc()
         print(f"CRITICAL API ERROR: {e}\n{tb_str}")
         raise HTTPException(status_code=500, detail=f"Backend Error: {str(e)}")
+
+@app.get("/api/price/{ticker}")
+def get_live_price(ticker: str):
+    try:
+        ticker = ticker.upper()
+        if not ticker.endswith('.JK') and not '.' in ticker:
+            ticker = f"{ticker}.JK"
+            
+        saham = yf.Ticker(ticker)
+        
+        current_price = 0.0
+        change_pct = 0.0
+        success = False
+        
+        # Fast history check
+        try:
+            hist = saham.history(period="1d")
+            if not hist.empty:
+                current_price = float(hist['Close'].iloc[-1])
+                prev_close = hist['Open'].iloc[-1]
+                info = saham.info
+                if info:
+                    prev_close = info.get('previousClose') or prev_close
+                if prev_close and prev_close > 0:
+                    change_pct = ((current_price - prev_close) / prev_close) * 100
+                success = True
+        except Exception:
+            pass
+            
+        if not success or current_price == 0.0:
+            # Query1 direct API fallback for resilience
+            try:
+                url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?range=1d&interval=1m"
+                headers = {
+                    'User-Agent': 'Mozilla/5.0'
+                }
+                r = requests.get(url, headers=headers, timeout=5)
+                if r.status_code == 200:
+                    res = r.json().get('chart', {}).get('result', [])[0]
+                    meta = res.get('meta', {})
+                    current_price = meta.get('regularMarketPrice')
+                    prev_close = meta.get('previousClose') or current_price
+                    if prev_close and prev_close > 0:
+                        change_pct = ((current_price - prev_close) / prev_close) * 100
+                    success = True
+            except Exception:
+                pass
+                
+        if not success or current_price == 0.0:
+            raise HTTPException(status_code=404, detail="Gagal mengambil harga real-time.")
+            
+        return {
+            "ticker": ticker,
+            "price": current_price,
+            "change_pct": change_pct
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.api_route("/health", methods=["GET", "HEAD"])
 def health_check():

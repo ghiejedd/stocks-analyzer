@@ -172,6 +172,29 @@ document.addEventListener('DOMContentLoaded', () => {
             changeEl.className = 'price-change';
         }
 
+        // Composite Target Price Rendering
+        const targetPrice = data.target_price;
+        const targetEl = document.getElementById('stock-target-price');
+        if (targetPrice && targetPrice > 0 && price) {
+            targetEl.textContent = `Target: Rp ${targetPrice.toLocaleString('id-ID')}`;
+            targetEl.style.display = 'inline-flex';
+            if (targetPrice > price) {
+                targetEl.style.color = 'var(--accent-green)';
+                targetEl.style.background = 'rgba(16, 185, 129, 0.08)';
+                targetEl.style.border = '1px solid rgba(16, 185, 129, 0.25)';
+            } else if (targetPrice < price) {
+                targetEl.style.color = 'var(--accent-red)';
+                targetEl.style.background = 'rgba(244, 63, 94, 0.08)';
+                targetEl.style.border = '1px solid rgba(244, 63, 94, 0.25)';
+            } else {
+                targetEl.style.color = 'var(--accent-yellow)';
+                targetEl.style.background = 'rgba(245, 158, 11, 0.08)';
+                targetEl.style.border = '1px solid rgba(245, 158, 11, 0.25)';
+            }
+        } else {
+            targetEl.style.display = 'none';
+        }
+
         // --- 3. Dynamic Radial Gauge & Recommendation ---
         const totalSkor = data.total_skor;
         const gaugeScore = document.getElementById('gauge-score');
@@ -230,10 +253,11 @@ document.addEventListener('DOMContentLoaded', () => {
         renderUMAShield(data.uma_filter);
         renderMeanReversionOU(data.mean_reversion_ou);
         renderCompanyProfile(profile.summary);
-        // --- 5. Clean up any previous ticker ---
+        // --- 5. Clean up previous price pooling & start new polling ---
         if (liveTickerInterval) {
             clearInterval(liveTickerInterval);
         }
+        startPricePooling(data.ticker);
     }
 
     // TradingView-like perfect logo & fallback avatar sequence (HD 256px)
@@ -1454,5 +1478,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error("Gagal memuat TradingView widget:", e);
             }
         }
+    }
+
+    function startPricePooling(ticker) {
+        if (liveTickerInterval) {
+            clearInterval(liveTickerInterval);
+        }
+        
+        liveTickerInterval = setInterval(async () => {
+            try {
+                const cleanTicker = ticker.replace('.JK', '').replace('.jk', '').toUpperCase();
+                const response = await fetch(`/api/price/${cleanTicker}`);
+                if (response.ok) {
+                    const priceData = await response.json();
+                    
+                    const priceEl = document.getElementById('stock-price');
+                    const changeEl = document.getElementById('stock-change');
+                    
+                    if (priceEl && priceData.price) {
+                        const formattedPrice = `Rp ${priceData.price.toLocaleString('id-ID')}`;
+                        if (priceEl.textContent !== formattedPrice) {
+                            priceEl.textContent = formattedPrice;
+                            
+                            // Micro-animation: subtle neon flash of mint green
+                            priceEl.classList.add('price-flash');
+                            setTimeout(() => {
+                                priceEl.classList.remove('price-flash');
+                            }, 500);
+                        }
+                    }
+                    
+                    if (changeEl && priceData.change_pct !== undefined) {
+                        const change = priceData.change_pct;
+                        changeEl.textContent = `${change > 0 ? '+' : ''}${change.toFixed(2)}%`;
+                        changeEl.className = `price-change ${change >= 0 ? 'text-green' : 'text-red'}`;
+                    }
+                }
+            } catch (e) {
+                console.error("Gagal melakukan pooling harga real-time:", e);
+            }
+        }, 8000); // Poll every 8 seconds
     }
 });
