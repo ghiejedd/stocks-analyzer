@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stocks Analyzer by Ziendraa</title>
-    <link rel="stylesheet" href="/static/styles.css?v=1.2">
+    <link rel="stylesheet" href="/static/styles.css?v=3.1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -35,7 +35,7 @@
             <div class="hero-content">
                 <h2 class="hero-title">Analisa Saham IDX dengan Standar Institusi Premium</h2>
                 <p class="hero-desc">
-                    Selamat datang di <strong>Stocks Analyzer</strong>. Sistem analisis multi-dimensi modern yang memadukan perhitungan valuasi intrinsik premium (DCF, Graham Number) dengan model kesehatan finansial (Altman Z-Score, Piotroski F-Score) serta indikator teknikal komprehensif secara real-time.
+                    Selamat datang di <strong>Stocks Analyzer</strong>. Sistem analisis arus kas mikro dan makro struktural yang memadukan perhitungan valuasi intrinsik premium (DCF, Graham Number) dengan model kesehatan finansial (Altman Z-Score, Piotroski F-Score) secara real-time.
                 </p>
                 <div class="quick-tips">
                     <span class="tip-label">Coba Cari Saham Populer:</span>
@@ -53,7 +53,7 @@
                     <div class="carousel-slides">
                         <!-- Slide 1: Welcome Illustration -->
                         <div class="carousel-slide active">
-                            <img src="/static/finance_hero.png" alt="Fintech Analytics Hero" class="hero-illustration">
+                            <img src="/static/finance_hero.png?v=3.0" alt="Fintech Analytics Hero" class="hero-illustration">
                             <div class="slide-caption">Stocks Analyzer Platform</div>
                         </div>
                         <!-- Slide 2: Premium Valuation -->
@@ -65,7 +65,7 @@
                                 <div class="slide-card-badge text-yellow">Institutional Grade</div>
                             </div>
                         </div>
-                        <!-- Slide 3: Financial Health -->
+                        <!-- Slide 3: Kesehatan Finansial -->
                         <div class="carousel-slide">
                             <div class="slide-glass-card">
                                 <div class="slide-card-icon">🛡️</div>
@@ -74,13 +74,13 @@
                                 <div class="slide-card-badge text-green">Credit Scoring</div>
                             </div>
                         </div>
-                        <!-- Slide 4: Modern Technicals -->
+                        <!-- Slide 4: Cashflow & Microstructure -->
                         <div class="carousel-slide">
                             <div class="slide-glass-card">
-                                <div class="slide-card-icon">⚡</div>
-                                <h3>Teknikal Modern</h3>
-                                <p>Sinyal tren multi-timeframe terintegrasi dengan rerata bergerak (EMA/MA), momentum osilator (RSI, MACD, Stoch), <strong>Ichimoku Cloud</strong>, dan deteksi pola <strong>Candlestick</strong> otomatis.</p>
-                                <div class="slide-card-badge text-blue">Advanced Trading</div>
+                                <div class="slide-card-icon">💹</div>
+                                <h3>Cashflow & Microstructure</h3>
+                                <p>Analisis arus dana institusi 10 dimensi: <strong>ETF Mechanics</strong>, Order Flow, Forced Buying/Selling, <strong>Market Microstructure</strong> (Kyle's Lambda), dan Risk-On/Risk-Off Regime Detection.</p>
+                                <div class="slide-card-badge text-blue">Institutional Grade</div>
                             </div>
                         </div>
                     </div>
@@ -156,7 +156,7 @@
             <div class="grid-layout">
                 
                 <!-- Fundamental Card -->
-                <div class="card glass" id="fundamental-card">
+                <div class="card glass span-full" id="fundamental-card">
                     <div class="card-header">
                         <h3>Analisis Fundamental</h3>
                         <span class="score" id="fund-skor">0</span>
@@ -299,62 +299,22 @@
                     </div>
                 </div>
 
-                <!-- Technical Card -->
-                <div class="card glass" id="technical-card">
+                <!-- Cashflow & Market Microstructure Card -->
+                <div class="card glass" id="cashflow-card">
                     <div class="card-header">
-                        <h3>Analisis Teknikal</h3>
-                        <span class="score" id="tek-skor">0</span>
+                        <h3>Analisis Cashflow & Microstructure</h3>
+                        <span class="score" id="cf-skor">0</span>
                     </div>
                     <div class="card-body">
-                        <div class="fase-badge" id="trend-summary-badge">SIDEWAYS</div>
+                        <div class="fase-badge" id="cf-regime-badge">NEUTRAL FLOW</div>
                         
-                        <!-- Zero-Trade Shield Banner -->
-                        <div class="zero-trade-banner" id="zero-trade-shield-box" style="display: none; margin-bottom: 15px;">
-                            <div class="zt-status-indicator">🛡️ Zero-Trade Shield: <span id="zt-shield-status">INAKTIF</span></div>
-                            <p class="zt-details" id="zt-shield-details">Mengamati momentum tren ADX & konfirmasi RSI...</p>
-                        </div>
-                        
-                        <ul class="reason-list" id="tek-alasan">
+                        <ul class="reason-list" id="cf-alasan">
                             <!-- reasons -->
                         </ul>
-                        <!-- Tren & Rerata Bergerak -->
-                        <div class="tek-section">
-                            <h4 class="section-subtitle">Tren & Rerata Bergerak</h4>
-                            <div class="metrics-grid" id="tek-ma">
-                                <!-- MA7, MA20, MA50, EMA200, Crossover -->
-                            </div>
-                        </div>
 
-                        <!-- Osilator & Momentum -->
-                        <div class="tek-section">
-                            <h4 class="section-subtitle">Osilator & Momentum</h4>
-                            <div class="metrics-grid" id="tek-oscillator">
-                                <!-- MACD, RSI, StochRSI, Williams %R, ADX -->
-                            </div>
-                        </div>
-
-                        <!-- Volatilitas & Jangkauan -->
-                        <div class="tek-section">
-                            <h4 class="section-subtitle">Volatilitas & Jangkauan</h4>
-                            <div class="metrics-grid" id="tek-volatility">
-                                <!-- BB, ATR -->
-                            </div>
-                        </div>
-
-                        <!-- Indikator Lanjutan -->
-                        <div class="tek-section">
-                            <h4 class="section-subtitle">Indikator Lanjutan</h4>
-                            <div class="metrics-grid" id="tek-advanced">
-                                <!-- Ichimoku, Parabolic SAR, VWAP -->
-                            </div>
-                        </div>
-
-                        <!-- Candlestick & Volume -->
-                        <div class="tek-section">
-                            <h4 class="section-subtitle">Candlestick & Volume</h4>
-                            <div class="metrics-grid" id="tek-candlestick-vol">
-                                <!-- Candlestick, Volume, Pressures -->
-                            </div>
+                        <!-- 10 Cashflow Sub-Modules -->
+                        <div class="cf-module-grid" id="cf-modules">
+                            <!-- Rendered dynamically by JS -->
                         </div>
                     </div>
                 </div>
@@ -472,19 +432,6 @@
                     </div>
                 </div>
 
-                <!-- Fibonacci Retracement Card -->
-                <div class="card glass" id="fibonacci-card">
-                    <div class="card-header">
-                        <h3>Fibonacci Retracement (6M)</h3>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-desc-info">Support & Resistance psikologis berdasarkan titik Swing High dan Swing Low 6 bulan terakhir.</p>
-                        <div class="fib-container" id="fibonacci-levels">
-                            <!-- fibonacci levels -->
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- Volume Profile Card -->
                 <div class="card glass" id="orderbook-card">
                     <div class="card-header">
@@ -496,31 +443,6 @@
                         </div>
                         <div class="ob-volume-profile" id="ob-volume-profile">
                             <!-- volume profile bars -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Support Resistance Card -->
-                <div class="card glass" id="support-resistance-card">
-                    <div class="card-header">
-                        <h3>Support & Resistance Levels (Pivot Point)</h3>
-                    </div>
-                    <div class="card-body sr-container">
-                        <div class="sr-column resistance">
-                            <h4>Resistance</h4>
-                            <div class="sr-item"><span>R3 (Extreme)</span><strong id="sr-r3">-</strong></div>
-                            <div class="sr-item"><span>R2 (Strong)</span><strong id="sr-r2">-</strong></div>
-                            <div class="sr-item"><span>R1 (Minor)</span><strong id="sr-r1">-</strong></div>
-                        </div>
-                        <div class="sr-column pivot">
-                            <h4>Pivot Point</h4>
-                            <div class="sr-item pivot-item"><span>Pivot</span><strong id="sr-pivot">-</strong></div>
-                        </div>
-                        <div class="sr-column support">
-                            <h4>Support</h4>
-                            <div class="sr-item"><span>S1 (Minor)</span><strong id="sr-s1">-</strong></div>
-                            <div class="sr-item"><span>S2 (Strong)</span><strong id="sr-s2">-</strong></div>
-                            <div class="sr-item"><span>S3 (Extreme)</span><strong id="sr-s3">-</strong></div>
                         </div>
                     </div>
                 </div>
@@ -902,6 +824,6 @@
         </div>
     </div>
     
-    <script src="/static/app.js?v=1.2"></script>
+    <script src="/static/app.js?v=3.1"></script>
 </body>
 </html>

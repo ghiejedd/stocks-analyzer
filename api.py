@@ -97,21 +97,23 @@ def analyze_stock(ticker: str):
         if data.empty:
             raise HTTPException(status_code=404, detail="Data saham tidak ditemukan. Pastikan kode saham valid (contoh: BBCA, TLKM).")
         
+        # Single saham.info load to avoid multiple rate-limiting requests on cloud environments
+        try:
+            saham_info = saham.info or {}
+        except Exception as info_err:
+            print(f"yfinance info fetch failed: {info_err}")
+            saham_info = {}
+
         # === Core Analysis (all wrapped for cloud resilience) ===
         try:
-            fund_data = stock_engine.get_fundamental(saham, ticker)
+            fund_data = stock_engine.get_fundamental(saham, ticker, info=saham_info)
         except Exception as e:
             fund_data = {"skor": 0, "alasan": [f"Error fundamental: {e}"], "valuasi": {}, "profitabilitas": {}, "laporan_keuangan": {}, "pertumbuhan": {}, "market_info": {"price": 0}}
 
         try:
-            tek_data, data = stock_engine.get_teknikal(data, ticker)
+            cashflow_data, data = stock_engine.get_cashflow_analysis(data, saham, ticker, info=saham_info)
         except Exception as e:
-            tek_data = {"skor": 0, "change_pct": 0, "sinyal": f"Error: {e}"}
-
-        try:
-            sr_data = stock_engine.get_support_resistance(data, ticker)
-        except Exception as e:
-            sr_data = {"pivot": None, "s1": None, "s2": None, "s3": None, "r1": None, "r2": None, "r3": None}
+            cashflow_data = {"skor": 0, "change_pct": 0, "regime": "ERROR", "alasan": [f"Error: {e}"]}
 
         try:
             orderbook_data = stock_engine.get_orderbook_analysis(data, ticker)
@@ -129,7 +131,7 @@ def analyze_stock(ticker: str):
             intra_data = {"strategy": f"Error: {e}"}
 
         try:
-            profile_data = stock_engine.get_company_profile(saham, ticker)
+            profile_data = stock_engine.get_company_profile(saham, ticker, info=saham_info)
         except Exception as e:
             clean = ticker.replace('.JK', '').upper()
             profile_data = {"name": clean, "sector": "N/A", "industry": "N/A", "summary": "Gagal memuat profil.", "website": "N/A", "domain": "", "logo": f"https://ui-avatars.com/api/?name={clean}&background=031413&color=09ECA9&size=256&bold=true", "logo_hd": ""}
@@ -157,19 +159,19 @@ def analyze_stock(ticker: str):
             }
 
         skor_fund = fund_data.get('skor', 0)
-        skor_tek = tek_data.get('skor', 0)
+        skor_cashflow = cashflow_data.get('skor', 0)
         skor_broker = broker_data.get('skor', 0)
         skor_news = news_data.get('skor_news', 0)
         
         total_skor, rekom = stock_engine.get_rekomendasi(
-            skor_fund, skor_tek, skor_broker, skor_news, 
+            skor_fund, skor_cashflow, skor_broker, skor_news, 
             uma_detected=uma_data.get('detected', False),
             crash_prob=crash_momentum_data.get('ex_ante_crash_probability', 0.0)
         )
         
         # === Other Advanced Quant Models ===
         try:
-            info = saham.info
+            info = saham_info
             mcap_raw = info.get('marketCap', 0) or 0
             price_raw = info.get('currentPrice') or info.get('regularMarketPrice') or 0
             pca_eva_data = stock_engine.get_pca_eva_score(info, mcap_raw, price_raw)
@@ -253,15 +255,8 @@ def analyze_stock(ticker: str):
             weighted_sum = sum(val * w for val, w in target_components)
             composite_target = weighted_sum / total_weight
         else:
-            # Technical target fallback
-            r1 = sr_data.get('r1')
-            r2 = sr_data.get('r2')
-            if r1 and r1 > current_price:
-                composite_target = r1
-            elif r2 and r2 > current_price:
-                composite_target = r2
-            else:
-                composite_target = current_price * 1.10
+            # Fallback target
+            composite_target = current_price * 1.10
                 
         # Limit target price to +/- 50% of current price to avoid math anomalies
         if current_price > 0:
@@ -278,8 +273,7 @@ def analyze_stock(ticker: str):
             "profile": profile_data,
             "news": news_data,
             "fundamental": fund_data,
-            "teknikal": tek_data,
-            "support_resistance": sr_data,
+            "cashflow": cashflow_data,
             "orderbook": orderbook_data,
             "broker": broker_data,
             "intraday": intra_data,
@@ -319,10 +313,7 @@ def get_live_price(ticker: str):
             hist = saham.history(period="1d")
             if not hist.empty:
                 current_price = float(hist['Close'].iloc[-1])
-                prev_close = hist['Open'].iloc[-1]
-                info = saham.info
-                if info:
-                    prev_close = info.get('previousClose') or prev_close
+                prev_close = float(hist['Open'].iloc[-1])
                 if prev_close and prev_close > 0:
                     change_pct = ((current_price - prev_close) / prev_close) * 100
                 success = True

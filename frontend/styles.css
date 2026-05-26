@@ -657,99 +657,105 @@ body {
     background: rgba(255, 255, 255, 0.04);
 }
 
-/* Fibonacci Levels styling */
-.fib-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.fib-bar-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(5, 28, 26, 0.4);
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
-    border-left: 3px solid var(--accent-blue);
-    font-size: 12px;
-}
-
-.fib-level-label {
-    width: 80px;
-    color: var(--text-secondary);
-    font-weight: 700;
-}
-
-.fib-progress-bg {
-    flex: 1;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
-    overflow: hidden;
-    position: relative;
-}
-
-.fib-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
-    border-radius: 3px;
-    transition: width 1s ease-out;
-}
-
-.fib-price {
-    font-family: 'Outfit', sans-serif;
-    font-weight: 700;
-    color: white;
-}
-
-/* Support Resistance Container */
-.sr-container {
+/* ============ CASHFLOW & MICROSTRUCTURE MODULES ============ */
+.cf-module-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
 }
 
 @media (min-width: 768px) {
-    .sr-container {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+    .cf-module-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
-.sr-column {
-    background: rgba(5, 28, 26, 0.5);
-    border-radius: var(--radius-md);
+.cf-module-card {
     padding: 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(5, 28, 26, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cf-module-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(9, 236, 169, 0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(9, 236, 169, 0.05);
+}
+
+.cf-module-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cf-module-icon {
+    font-size: 22px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.cf-module-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.2px;
+    flex: 1;
+    margin: 0;
+}
+
+.cf-module-skor {
+    font-size: 13px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 3px 10px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-family: 'Outfit', sans-serif;
+    flex-shrink: 0;
+}
+
+.cf-module-signal {
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-.sr-column h4 {
-    text-align: center;
-    margin-bottom: 16px;
-    font-size: 12px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    font-weight: 700;
-    letter-spacing: 0.5px;
+.cf-metrics {
+    gap: 8px !important;
+    margin-top: 8px !important;
 }
 
-.sr-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+.cf-metrics .metric-item {
+    padding: 10px;
+    background: rgba(5, 28, 26, 0.3);
+    border-radius: 8px;
+}
+
+.cf-metrics .metric-label {
+    font-size: 9px;
+}
+
+.cf-metrics .metric-value {
     font-size: 13px;
-    color: var(--text-secondary);
 }
 
-.sr-item:last-child {
-    border-bottom: none;
+/* Cashflow card should span full width on 2-col grid */
+#cashflow-card {
+    grid-column: 1 / -1;
 }
 
-.resistance .sr-item strong { color: var(--accent-red); font-family: 'Outfit', sans-serif; }
-.support .sr-item strong { color: var(--accent-green); font-family: 'Outfit', sans-serif; }
-.pivot-item strong { color: var(--accent-yellow); font-size: 16px; font-family: 'Outfit', sans-serif; }
 
 /* Company Description summary */
 .company-summary-text {
@@ -1801,4 +1807,90 @@ body {
     width: 24px;
     border-radius: 6px;
     box-shadow: 0 0 10px rgba(9, 236, 169, 0.6);
+}
+
+/* Responsive adjustments for full-width Fundamental Card */
+#fundamental-card {
+    grid-column: 1 / -1;
+}
+
+@media (min-width: 768px) {
+    #fund-alasan {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px 24px;
+    }
+    
+    #fundamental-card .metrics-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+    
+    #graham-valuation-box {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    
+    #graham-valuation-box h4 {
+        grid-column: 1 / -1;
+    }
+    
+    #graham-valuation-box .valuation-sub-box {
+        margin-bottom: 0 !important;
+        border-top: none !important;
+        padding-top: 0 !important;
+    }
+    
+    /* Add borders between columns for high-end look */
+    #graham-valuation-box .valuation-sub-box:not(:first-of-type) {
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+        padding-left: 20px;
+    }
+}
+
+@media (min-width: 1200px) {
+    #fundamental-card .metrics-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
+/* Responsive adjustments for full-width News Grid & explicitly preventing horizontal scroll */
+.news-grid#news-container {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-auto-flow: row !important;
+    overflow-x: visible !important;
+    white-space: normal !important;
+    width: 100% !important;
+    gap: 16px !important;
+}
+
+@media (min-width: 768px) {
+    .news-grid#news-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .news-grid#news-container {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (min-width: 1400px) {
+    .news-grid#news-container {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
+
+.news-item {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: unset !important;
+    white-space: normal !important;
+}
+
+/* Enforce News Card to span full width of the grid to fill the empty right column and prevent text cutoff */
+#news-card {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
 }

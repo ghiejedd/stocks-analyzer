@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- 2. Price & Change Percentage ---
         const price = data.fundamental.market_info.price;
-        const change = data.teknikal.change_pct;
+        const change = data.cashflow.change_pct;
         
         document.getElementById('stock-price').textContent = price ? `Rp ${price.toLocaleString('id-ID')}` : 'N/A';
         
@@ -240,12 +240,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- 4. Render Components ---
         renderFundamental(data.fundamental);
-        renderTeknikal(data.teknikal);
+        renderCashflow(data.cashflow);
         renderBroker(data.broker);
         renderIntraday(data.intraday);
-        renderFibonacci(data.teknikal.fibonacci, price);
         renderOrderBook(data.orderbook);
-        renderSupportResistance(data.support_resistance);
         renderTradingViewChart(data.ticker);
         renderNews(data.news);
         renderPCA(data.pca_eva);
@@ -370,9 +368,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="metric-item"><span class="metric-label">Forward PE</span><span class="metric-value">${data.valuasi.fwd_pe}</span></div>
             <div class="metric-item"><span class="metric-label">PEG Ratio</span><span class="metric-value">${data.valuasi.peg}</span></div>
             <div class="metric-item"><span class="metric-label">PBV</span><span class="metric-value">${data.valuasi.pbv}</span></div>
-            <div class="metric-item"><span class="metric-label">P/S (TTM)</span><span class="metric-value">${data.valuasi.ps}</span></div>
-            <div class="metric-item"><span class="metric-label">EV/EBITDA</span><span class="metric-value">${data.valuasi.ev_ebitda}</span></div>
-            <div class="metric-item"><span class="metric-label">EV/Revenue</span><span class="metric-value">${data.valuasi.ev_rev}</span></div>
         `;
 
         // Profitabilitas
@@ -380,9 +375,6 @@ document.addEventListener('DOMContentLoaded', () => {
         profitGrid.innerHTML = `
             <div class="metric-item"><span class="metric-label">ROE</span><span class="metric-value">${data.profitabilitas.roe}</span></div>
             <div class="metric-item"><span class="metric-label">ROA</span><span class="metric-value">${data.profitabilitas.roa}</span></div>
-            <div class="metric-item"><span class="metric-label">Gross Margin</span><span class="metric-value">${data.profitabilitas.gpm}</span></div>
-            <div class="metric-item"><span class="metric-label">EBITDA Margin</span><span class="metric-value">${data.profitabilitas.ebitda_margin}</span></div>
-            <div class="metric-item"><span class="metric-label">Operating Margin</span><span class="metric-value">${data.profitabilitas.opm}</span></div>
             <div class="metric-item"><span class="metric-label">Net Profit Margin</span><span class="metric-value">${data.profitabilitas.npm}</span></div>
         `;
 
@@ -390,18 +382,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const lkGrid = document.getElementById('fund-lk');
         lkGrid.innerHTML = `
             <div class="metric-item"><span class="metric-label">Revenue</span><span class="metric-value">${data.laporan_keuangan.rev}</span></div>
-            <div class="metric-item"><span class="metric-label">EBITDA</span><span class="metric-value">${data.laporan_keuangan.ebitda}</span></div>
             <div class="metric-item"><span class="metric-label">Net Income</span><span class="metric-value">${data.laporan_keuangan.ni}</span></div>
             <div class="metric-item"><span class="metric-label">EPS (TTM)</span><span class="metric-value">${data.laporan_keuangan.eps}</span></div>
-            <div class="metric-item"><span class="metric-label">Forward EPS</span><span class="metric-value">${data.laporan_keuangan.fwd_eps}</span></div>
-            <div class="metric-item"><span class="metric-label">Book Value/Share</span><span class="metric-value">${data.laporan_keuangan.bv}</span></div>
-            <div class="metric-item"><span class="metric-label">Total Debt</span><span class="metric-value">${data.laporan_keuangan.td}</span></div>
-            <div class="metric-item"><span class="metric-label">Total Cash</span><span class="metric-value">${data.laporan_keuangan.tc}</span></div>
-            <div class="metric-item"><span class="metric-label">Operating CF</span><span class="metric-value">${data.laporan_keuangan.ocf}</span></div>
             <div class="metric-item"><span class="metric-label">Free Cash Flow</span><span class="metric-value">${data.laporan_keuangan.fcf}</span></div>
             <div class="metric-item"><span class="metric-label">DER</span><span class="metric-value">${data.laporan_keuangan.der}</span></div>
             <div class="metric-item"><span class="metric-label">Current Ratio</span><span class="metric-value">${data.laporan_keuangan.cr}</span></div>
-            <div class="metric-item"><span class="metric-label">Quick Ratio</span><span class="metric-value">${data.laporan_keuangan.qr}</span></div>
         `;
 
         // Pertumbuhan
@@ -409,24 +394,15 @@ document.addEventListener('DOMContentLoaded', () => {
         growthGrid.innerHTML = `
             <div class="metric-item"><span class="metric-label">Revenue Growth (YoY)</span><span class="metric-value">${data.pertumbuhan.rev_growth_yoy}</span></div>
             <div class="metric-item"><span class="metric-label">Earnings Growth (YoY)</span><span class="metric-value">${data.pertumbuhan.earn_growth_yoy}</span></div>
-            <div class="metric-item"><span class="metric-label">Revenue Growth (QoQ)</span><span class="metric-value">${data.pertumbuhan.rev_growth_qoq}</span></div>
-            <div class="metric-item"><span class="metric-label">Earnings Growth (QoQ)</span><span class="metric-value">${data.pertumbuhan.earn_growth_qoq}</span></div>
         `;
 
         // Market Info
         const marketGrid = document.getElementById('fund-market');
         marketGrid.innerHTML = `
             <div class="metric-item"><span class="metric-label">Market Cap</span><span class="metric-value">${data.market_info.mcap}</span></div>
-            <div class="metric-item"><span class="metric-label">Enterprise Value</span><span class="metric-value">${data.market_info.ev}</span></div>
             <div class="metric-item"><span class="metric-label">Beta</span><span class="metric-value">${data.market_info.beta}</span></div>
-            <div class="metric-item"><span class="metric-label">Avg Volume</span><span class="metric-value">${data.market_info.avg_vol}</span></div>
-            <div class="metric-item"><span class="metric-label">52W High</span><span class="metric-value">${data.market_info.hi52}</span></div>
-            <div class="metric-item"><span class="metric-label">52W Low</span><span class="metric-value">${data.market_info.lo52}</span></div>
-            <div class="metric-item"><span class="metric-label">% dari 52W High</span><span class="metric-value ${data.market_info.pct_from_hi && data.market_info.pct_from_hi.startsWith('-') ? 'text-red' : 'text-green'}">${data.market_info.pct_from_hi}</span></div>
-            <div class="metric-item"><span class="metric-label">% dari 52W Low</span><span class="metric-value ${data.market_info.pct_from_lo && data.market_info.pct_from_lo.startsWith('+') ? 'text-green' : 'text-red'}">${data.market_info.pct_from_lo}</span></div>
             <div class="metric-item"><span class="metric-label">Dividend Yield</span><span class="metric-value">${data.market_info.dy}</span></div>
             <div class="metric-item"><span class="metric-label">Dividend/Share</span><span class="metric-value">${data.market_info.dps}</span></div>
-            <div class="metric-item"><span class="metric-label">Payout Ratio</span><span class="metric-value">${data.market_info.payout}</span></div>
         `;
 
         // DCF Valuation Box
@@ -500,173 +476,170 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderTeknikal(data) {
-        const skorEl = document.getElementById('tek-skor');
+    function renderCashflow(data) {
+        const skorEl = document.getElementById('cf-skor');
         skorEl.textContent = data.skor > 0 ? `+${data.skor}` : data.skor;
         skorEl.className = `score ${data.skor >= 0 ? 'text-green' : 'text-red'}`;
 
-        // Trend Summary Badge
-        const trendBadge = document.getElementById('trend-summary-badge');
-        if (data.trend_summary) {
-            trendBadge.textContent = `${data.trend_summary.label} (Score: ${data.trend_summary.score})`;
-            if (data.trend_summary.label.includes('UPTREND')) {
-                trendBadge.style.color = 'var(--accent-green)';
-                trendBadge.style.background = 'rgba(16, 185, 129, 0.08)';
-                trendBadge.style.borderColor = 'rgba(16, 185, 129, 0.2)';
-            } else if (data.trend_summary.label.includes('DOWNTREND')) {
-                trendBadge.style.color = 'var(--accent-red)';
-                trendBadge.style.background = 'rgba(244, 63, 94, 0.08)';
-                trendBadge.style.borderColor = 'rgba(244, 63, 94, 0.2)';
-            } else {
-                trendBadge.style.color = 'var(--accent-yellow)';
-                trendBadge.style.background = 'rgba(245, 158, 11, 0.08)';
-                trendBadge.style.borderColor = 'rgba(245, 158, 11, 0.2)';
-            }
+        // Regime Badge
+        const regimeBadge = document.getElementById('cf-regime-badge');
+        regimeBadge.textContent = data.regime || 'NEUTRAL FLOW';
+        if (data.regime && data.regime.includes('INFLOW')) {
+            regimeBadge.style.color = 'var(--accent-green)';
+            regimeBadge.style.background = 'rgba(16, 185, 129, 0.08)';
+            regimeBadge.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+        } else if (data.regime && data.regime.includes('OUTFLOW')) {
+            regimeBadge.style.color = 'var(--accent-red)';
+            regimeBadge.style.background = 'rgba(244, 63, 94, 0.08)';
+            regimeBadge.style.borderColor = 'rgba(244, 63, 94, 0.2)';
+        } else {
+            regimeBadge.style.color = 'var(--accent-yellow)';
+            regimeBadge.style.background = 'rgba(245, 158, 11, 0.08)';
+            regimeBadge.style.borderColor = 'rgba(245, 158, 11, 0.2)';
         }
 
-        // Zero-Trade Shield
-        const ztBox = document.getElementById('zero-trade-shield-box');
-        const ztStatus = document.getElementById('zt-shield-status');
-        const ztDetails = document.getElementById('zt-shield-details');
-        
-        if (ztBox && data.zero_trade_prevention) {
-            ztBox.style.display = 'block';
-            const zt = data.zero_trade_prevention;
-            if (zt.triggered) {
-                ztStatus.textContent = 'TERPICU (SINYAL BELI / BUY TRIGGERED)';
-                ztStatus.className = 'text-green font-bold';
-                ztDetails.textContent = `Tren Bullish Kuat (ADX: ${zt.adx.toFixed(1)} > 20, Close > EMA50) + RSI Pullback Recovery (${zt.rsi.toFixed(1)} memotong ke atas 40). Eksekusi Beli Taktis Aktif!`;
-                ztBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-                ztBox.style.background = 'rgba(16, 185, 129, 0.08)';
-            } else {
-                ztStatus.textContent = 'AKTIF / MENGAMATI (STANDBY)';
-                ztStatus.className = 'text-yellow';
-                let detailsStr = `Sistem memisahkan kekuatan tren (ADX: ${zt.adx.toFixed(1)} ${zt.adx > 20 ? '> 20 ✓' : '≤ 20'}) `;
-                detailsStr += `dan posisi harga vs EMA50 (${zt.ema50 ? 'Close ' + (zt.trend_bullish ? '>' : '<=') + ' EMA50' : 'N/A'}). `;
-                detailsStr += `Status RSI saat ini: ${zt.rsi.toFixed(1)}. Menunggu kondisi RSI Pullback Recovery (RSI < 40 lalu crossing di atas 40) untuk memicu entri belanja.`;
-                ztDetails.textContent = detailsStr;
-                ztBox.style.borderColor = 'rgba(255, 255, 255, 0.05)';
-                ztBox.style.background = 'rgba(0, 0, 0, 0.2)';
+        // Reasons
+        const alasanList = document.getElementById('cf-alasan');
+        alasanList.innerHTML = (data.alasan || []).map(a => `<li>${a}</li>`).join('');
+
+        // 10 Sub-Modules
+        const modulesContainer = document.getElementById('cf-modules');
+        const modules = [
+            { key: 'etf_mechanics', title: 'ETF Mechanics', icon: '🏦', colorVar: '--accent-blue',
+              fields: [
+                { label: 'ETF Eligible', key: 'etf_eligible', fmt: v => v ? '✅ Ya' : '❌ Tidak' },
+                { label: 'Rebal Vol Ratio', key: 'rebal_vol_ratio', fmt: v => `${v}x` },
+                { label: 'Near Month-End', key: 'near_month_end', fmt: v => v ? '✅' : '—' },
+                { label: 'Near Quarter-End', key: 'near_quarter_end', fmt: v => v ? '✅' : '—' },
+                { label: 'Est. ETF Weight', key: 'etf_weight_est' },
+                { label: 'Flow Impact', key: 'flow_impact' }
+              ]
+            },
+            { key: 'index_rebalancing', title: 'Index Rebalancing', icon: '📊', colorVar: '--accent-yellow',
+              fields: [
+                { label: 'Status', key: 'status' },
+                { label: 'MCap (Triliun)', key: 'mcap_triliun', fmt: v => `${v}T` },
+                { label: 'Turnover/Day', key: 'daily_turnover_miliar', fmt: v => `${v}M` },
+                { label: 'IDX30 Candidate', key: 'idx30_candidate', fmt: v => v ? '✅' : '❌' },
+                { label: 'LQ45 Candidate', key: 'lq45_candidate', fmt: v => v ? '✅' : '❌' },
+                { label: 'Momentum 20D', key: 'momentum_20d' }
+              ]
+            },
+            { key: 'liquidity', title: 'Analisis Likuiditas', icon: '💧', colorVar: '--accent-blue',
+              fields: [
+                { label: 'Amihud Ratio', key: 'amihud_ratio' },
+                { label: 'Turnover Ratio', key: 'turnover_ratio' },
+                { label: 'Roll Spread', key: 'roll_spread' },
+                { label: 'Spread %', key: 'spread_pct' },
+                { label: 'HL Spread', key: 'hl_spread_pct' },
+                { label: 'Avg Daily Volume', key: 'avg_daily_volume' }
+              ]
+            },
+            { key: 'order_flow', title: 'Order Flow', icon: '🔄', colorVar: '--accent-green',
+              fields: [
+                { label: 'CLV (Hari Ini)', key: 'clv_current' },
+                { label: 'CLV (5D Avg)', key: 'clv_5d_avg' },
+                { label: 'VWAP', key: 'vwap' },
+                { label: 'VWAP Deviation', key: 'vwap_deviation' },
+                { label: 'Buy Flow', key: 'flow_ratio_buy' },
+                { label: 'Sell Flow', key: 'flow_ratio_sell' },
+                { label: 'Buy Pressure', key: 'buy_pressure', fmt: v => `${v}%` },
+                { label: 'Sell Pressure', key: 'sell_pressure', fmt: v => `${v}%` }
+              ]
+            },
+            { key: 'forced_flow', title: 'Forced Buying/Selling', icon: '⚡', colorVar: '--accent-red',
+              fields: [
+                { label: 'Tipe Deteksi', key: 'detected_type' },
+                { label: 'Volume Ratio', key: 'vol_ratio', fmt: v => `${v}x` },
+                { label: 'Return 3D', key: 'cum_return_3d' },
+                { label: 'Akselerasi', key: 'accelerating', fmt: v => v ? '✅ Ya' : '— Tidak' },
+                { label: 'Vol Spike', key: 'vol_spike', fmt: v => v ? '⚠️ Ya' : '— Tidak' }
+              ]
+            },
+            { key: 'positioning', title: 'Positioning', icon: '🎯', colorVar: '--accent-yellow',
+              fields: [
+                { label: 'Short Interest Proxy', key: 'short_interest_proxy' },
+                { label: 'Long Ratio', key: 'long_ratio' },
+                { label: 'Days to Cover', key: 'days_to_cover', fmt: v => `${v} hari` },
+                { label: 'Inst. Dominance', key: 'institutional_dominance', fmt: v => `${v}x` }
+              ]
+            },
+            { key: 'crowded_trade', title: 'Crowded Trade', icon: '👥', colorVar: '--accent-red',
+              fields: [
+                { label: 'Level', key: 'crowded_level' },
+                { label: 'Max Streak', key: 'max_streak', fmt: v => `${v} hari` },
+                { label: 'Autocorrelation', key: 'autocorrelation' },
+                { label: 'Vol Gini', key: 'vol_gini' },
+                { label: 'CV Returns', key: 'cv_returns' }
+              ]
+            },
+            { key: 'microstructure', title: 'Market Microstructure', icon: '🔬', colorVar: '--accent-blue',
+              fields: [
+                { label: "Kyle's Lambda (λ)", key: 'kyle_lambda' },
+                { label: 'Realized Variance', key: 'realized_variance' },
+                { label: 'Jump Component', key: 'jump_component' },
+                { label: 'Continuous', key: 'continuous_component' },
+                { label: 'Noise/Signal', key: 'noise_to_signal', fmt: v => `${v}x` },
+                { label: 'Jumps (20D)', key: 'num_jumps_20d' }
+              ]
+            },
+            { key: 'passive_active_flow', title: 'Passive vs Active Flow', icon: '⚖️', colorVar: '--accent-yellow',
+              fields: [
+                { label: 'Passive Est.', key: 'passive_est' },
+                { label: 'Active Est.', key: 'active_est' },
+                { label: 'Vol-Ret Correlation', key: 'vol_ret_correlation' },
+                { label: 'Vol CV', key: 'vol_cv' }
+              ]
+            },
+            { key: 'risk_on_risk_off', title: 'Risk-On / Risk-Off', icon: '🌡️', colorVar: '--accent-green',
+              fields: [
+                { label: 'Regime', key: 'regime' },
+                { label: 'Risk Score', key: 'risk_score' },
+                { label: 'Beta', key: 'beta' },
+                { label: 'Recent Vol (Ann.)', key: 'recent_vol_annual' },
+                { label: 'Hist Vol (Ann.)', key: 'hist_vol_annual' },
+                { label: 'Vol Regime Ratio', key: 'vol_regime_ratio', fmt: v => `${v}x` },
+                { label: 'Downside Dev.', key: 'downside_dev' },
+                { label: 'Momentum 10D', key: 'momentum_10d' }
+              ]
             }
-        } else if (ztBox) {
-            ztBox.style.display = 'none';
-        }
+        ];
 
-        const alasanList = document.getElementById('tek-alasan');
-        alasanList.innerHTML = data.alasan.map(a => `<li>${a}</li>`).join('');
+        let html = '';
+        modules.forEach(mod => {
+            const modData = data[mod.key] || {};
+            const modSkor = modData.skor || 0;
+            const modSignal = modData.signal || 'N/A';
+            
+            let signalColorClass = 'text-muted';
+            if (modSkor > 0) signalColorClass = 'text-green';
+            else if (modSkor < 0) signalColorClass = 'text-red';
 
-        // 1. Tren & Rerata Bergerak
-        const maGrid = document.getElementById('tek-ma');
-        const cro = data.ma.crossover || 'TIDAK ADA CROSSOVER';
-        let croClass = 'text-muted';
-        if (cro.includes('GOLDEN')) croClass = 'text-green font-bold';
-        else if (cro.includes('DEATH')) croClass = 'text-red font-bold';
+            let borderColor = 'rgba(255,255,255,0.05)';
+            if (modSkor > 0) borderColor = 'rgba(16, 185, 129, 0.15)';
+            else if (modSkor < 0) borderColor = 'rgba(244, 63, 94, 0.15)';
 
-        maGrid.innerHTML = `
-            <div class="metric-item"><span class="metric-label">MA 7 (Short-term)</span><span class="metric-value">${data.ma.ma7 ? 'Rp ' + Math.round(data.ma.ma7).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">MA 20 (Medium-term)</span><span class="metric-value">${data.ma.ma20 ? 'Rp ' + Math.round(data.ma.ma20).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">MA 50 (Semi Long-term)</span><span class="metric-value">${data.ma.ma50 ? 'Rp ' + Math.round(data.ma.ma50).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">EMA 200 (Long-term)</span><span class="metric-value">${data.ema200 ? 'Rp ' + Math.round(data.ema200).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">MA Crossover</span><span class="metric-value ${croClass}">${cro}</span></div>
-        `;
+            html += `
+                <div class="cf-module-card glass" style="border-color: ${borderColor};">
+                    <div class="cf-module-header">
+                        <span class="cf-module-icon">${mod.icon}</span>
+                        <h5 class="cf-module-title">${mod.title}</h5>
+                        <span class="cf-module-skor ${signalColorClass}">${modSkor > 0 ? '+' : ''}${modSkor}</span>
+                    </div>
+                    <p class="cf-module-signal ${signalColorClass}">${modSignal}</p>
+                    <div class="metrics-grid cf-metrics">`;
+            
+            mod.fields.forEach(field => {
+                let val = modData[field.key];
+                if (val === undefined || val === null) val = 'N/A';
+                if (field.fmt && val !== 'N/A') val = field.fmt(val);
+                html += `<div class="metric-item"><span class="metric-label">${field.label}</span><span class="metric-value">${val}</span></div>`;
+            });
+            
+            html += `</div></div>`;
+        });
 
-        // 2. Osilator & Momentum
-        const oscGrid = document.getElementById('tek-oscillator');
-        
-        // RSI color coding
-        let rsiClass = '';
-        if (data.rsi < 30) rsiClass = 'text-green';
-        else if (data.rsi > 70) rsiClass = 'text-red';
-        
-        // StochRSI color coding
-        let stochClass = '';
-        if (data.stoch_rsi < 20) stochClass = 'text-green';
-        else if (data.stoch_rsi > 80) stochClass = 'text-red';
-        
-        // Williams %R color coding
-        let wrClass = '';
-        if (data.williams_r < -80) wrClass = 'text-green';
-        else if (data.williams_r > -20) wrClass = 'text-red';
-
-        // MACD crossover coloring
-        const macdCro = data.macd.crossover || 'NETRAL';
-        let mCroClass = 'text-muted';
-        if (macdCro.includes('BULLISH')) mCroClass = 'text-green';
-        else if (macdCro.includes('BEARISH')) mCroClass = 'text-red';
-
-        // ADX color coding
-        let adxTrend = 'Netral';
-        let adxClass = 'text-muted';
-        if (data.adx.adx > 25) {
-            if (data.adx.pdi > data.adx.mdi) {
-                adxTrend = 'Tren Naik Kuat';
-                adxClass = 'text-green';
-            } else {
-                adxTrend = 'Tren Turun Kuat';
-                adxClass = 'text-red';
-            }
-        }
-
-        oscGrid.innerHTML = `
-            <div class="metric-item"><span class="metric-label">RSI (14)</span><span class="metric-value ${rsiClass}">${data.rsi ? data.rsi.toFixed(2) : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">StochRSI (14)</span><span class="metric-value ${stochClass}">${data.stoch_rsi ? data.stoch_rsi.toFixed(2) : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Williams %R</span><span class="metric-value ${wrClass}">${data.williams_r ? data.williams_r.toFixed(2) : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">ADX (Kekuatan Tren)</span><span class="metric-value ${adxClass}">${data.adx.adx ? data.adx.adx.toFixed(2) : 'N/A'} (${adxTrend})</span></div>
-            <div class="metric-item"><span class="metric-label">Plus DI (+DI)</span><span class="metric-value text-green">${data.adx.pdi ? data.adx.pdi.toFixed(2) : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Minus DI (-DI)</span><span class="metric-value text-red">${data.adx.mdi ? data.adx.mdi.toFixed(2) : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">MACD Value</span><span class="metric-value">${data.macd.macd ? data.macd.macd.toFixed(2) : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">MACD Signal</span><span class="metric-value">${data.macd.signal ? data.macd.signal.toFixed(2) : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">MACD Hist</span><span class="metric-value ${data.macd.hist > 0 ? 'text-green' : data.macd.hist < 0 ? 'text-red' : ''}">${data.macd.hist ? data.macd.hist.toFixed(2) : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">MACD Crossover</span><span class="metric-value ${mCroClass}">${macdCro}</span></div>
-        `;
-
-        // 3. Volatilitas & Jangkauan
-        const volGrid = document.getElementById('tek-volatility');
-        volGrid.innerHTML = `
-            <div class="metric-item"><span class="metric-label">Bollinger Upper BB</span><span class="metric-value">${data.bb.upper ? 'Rp ' + Math.round(data.bb.upper).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Bollinger Mid BB</span><span class="metric-value">${data.bb.mid ? 'Rp ' + Math.round(data.bb.mid).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Bollinger Lower BB</span><span class="metric-value">${data.bb.lower ? 'Rp ' + Math.round(data.bb.lower).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">BB Width (Volatilitas)</span><span class="metric-value">${data.bb.width ? data.bb.width.toFixed(2) + '%' : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">ATR (14) (Range Harian)</span><span class="metric-value">${data.atr ? 'Rp ' + Math.round(data.atr).toLocaleString('id-ID') : 'N/A'}</span></div>
-        `;
-
-        // 4. Indikator Lanjutan
-        const advGrid = document.getElementById('tek-advanced');
-        const ichSig = data.ichimoku ? data.ichimoku.signal : 'N/A';
-        const ichClass = ichSig.includes('BULLISH') ? 'text-green' : ichSig.includes('BEARISH') ? 'text-red' : 'text-yellow';
-        
-        const psarTrend = data.parabolic_sar ? data.parabolic_sar.trend : 'N/A';
-        const psarClass = psarTrend === 'UPTREND' ? 'text-green' : psarTrend === 'DOWNTREND' ? 'text-red' : '';
-
-        advGrid.innerHTML = `
-            <div class="metric-item"><span class="metric-label">Ichimoku Signal</span><span class="metric-value ${ichClass}">${ichSig}</span></div>
-            <div class="metric-item"><span class="metric-label">Tenkan-sen</span><span class="metric-value">${data.ichimoku.tenkan ? 'Rp ' + Math.round(data.ichimoku.tenkan).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Kijun-sen</span><span class="metric-value">${data.ichimoku.kijun ? 'Rp ' + Math.round(data.ichimoku.kijun).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Senkou Span A</span><span class="metric-value">${data.ichimoku.senkou_a ? 'Rp ' + Math.round(data.ichimoku.senkou_a).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Senkou Span B</span><span class="metric-value">${data.ichimoku.senkou_b ? 'Rp ' + Math.round(data.ichimoku.senkou_b).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Parabolic SAR</span><span class="metric-value ${psarClass}">${data.parabolic_sar.value ? 'Rp ' + Math.round(data.parabolic_sar.value).toLocaleString('id-ID') : 'N/A'} (${psarTrend})</span></div>
-            <div class="metric-item"><span class="metric-label">VWAP Value</span><span class="metric-value">${data.vwap.vwap ? 'Rp ' + Math.round(data.vwap.vwap).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">VWAP Upper Band</span><span class="metric-value">${data.vwap.upper ? 'Rp ' + Math.round(data.vwap.upper).toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">VWAP Lower Band</span><span class="metric-value">${data.vwap.lower ? 'Rp ' + Math.round(data.vwap.lower).toLocaleString('id-ID') : 'N/A'}</span></div>
-        `;
-
-        // 5. Candlestick & Volume
-        const candVolGrid = document.getElementById('tek-candlestick-vol');
-        const patternStr = data.patterns && data.patterns.length > 0 ? data.patterns.join(', ') : 'Tidak Ada Pola Terdeteksi';
-        const isBullishPattern = data.patterns && data.patterns.some(p => p.includes('BULLISH') || p.includes('HAMMER') || p.includes('MORNING'));
-        const isBearishPattern = data.patterns && data.patterns.some(p => p.includes('BEARISH') || p.includes('SHOOTING') || p.includes('EVENING'));
-        let patternClass = 'text-muted';
-        if (isBullishPattern) patternClass = 'text-green font-bold';
-        else if (isBearishPattern) patternClass = 'text-red font-bold';
-
-        candVolGrid.innerHTML = `
-            <div class="metric-item"><span class="metric-label">Pola Candlestick</span><span class="metric-value ${patternClass}">${patternStr}</span></div>
-            <div class="metric-item"><span class="metric-label">Volume Transaksi</span><span class="metric-value">${data.volume.vol ? data.volume.vol.toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Rata-rata Volume (20D)</span><span class="metric-value">${data.volume.vol_ma20 ? data.volume.vol_ma20.toLocaleString('id-ID') : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Rasio Volume vs MA20</span><span class="metric-value">${(data.volume.vol && data.volume.vol_ma20) ? (data.volume.vol / data.volume.vol_ma20).toFixed(2) + 'x' : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Buy Pressure (Orderbook)</span><span class="metric-value text-green">${data.orderbook.buy_pressure ? data.orderbook.buy_pressure.toFixed(1) + '%' : 'N/A'}</span></div>
-            <div class="metric-item"><span class="metric-label">Sell Pressure (Orderbook)</span><span class="metric-value text-red">${data.orderbook.sell_pressure ? data.orderbook.sell_pressure.toFixed(1) + '%' : 'N/A'}</span></div>
-        `;
+        modulesContainer.innerHTML = html;
     }
 
     function renderBroker(data) {
@@ -757,65 +730,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="metric-value">${data.vol_ratio.toFixed(2)}x</span>
             </div>
         `;
-    }
-
-    function renderFibonacci(fib, currentPrice) {
-        const container = document.getElementById('fibonacci-levels');
-        if (!fib || fib.fib_100 === 0) {
-            container.innerHTML = `<p class="text-muted">Data Fibonacci tidak tersedia.</p>`;
-            return;
-        }
-
-        const low = fib.fib_0;
-        const high = fib.fib_100;
-        const range = high - low;
-        
-        const levels = [
-            { key: 'fib_100', label: '100% (High)' },
-            { key: 'fib_786', label: '78.6%' },
-            { key: 'fib_618', label: '61.8%' },
-            { key: 'fib_50',  label: '50.0% (Pivot)' },
-            { key: 'fib_382', label: '38.2%' },
-            { key: 'fib_236', label: '23.6%' },
-            { key: 'fib_0',   label: '0% (Low)' }
-        ];
-        
-        let fibHTML = '';
-        levels.forEach(lvl => {
-            const price = fib[lvl.key];
-            const valPct = range > 0 ? ((price - low) / range) * 100 : 0;
-            
-            // Highlight near levels (within 1.0% margin)
-            const isNear = Math.abs(currentPrice - price) / price <= 0.01;
-            const borderStyle = isNear ? 'style="border-left: 3px solid var(--accent-yellow); background: rgba(245, 158, 11, 0.06);"' : '';
-            const nearLabel = isNear ? ' <span class="text-yellow" style="font-size: 8px; font-weight: 800; margin-left: 6px; padding: 1px 4px; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 3px; background: rgba(245, 158, 11, 0.05);">DEKAT HARGA</span>' : '';
-            
-            fibHTML += `
-                <div class="fib-bar-item" ${borderStyle}>
-                    <span class="fib-level-label">${lvl.label}${nearLabel}</span>
-                    <div class="fib-progress-bg">
-                        <div class="fib-progress-fill" style="width: ${valPct}%"></div>
-                    </div>
-                    <span class="fib-price">Rp ${Math.round(price).toLocaleString('id-ID')}</span>
-                </div>
-            `;
-        });
-        
-        container.innerHTML = fibHTML;
-    }
-
-    function renderSupportResistance(data) {
-        const formatRp = (val) => val ? `Rp ${val.toLocaleString('id-ID')}` : '-';
-        
-        document.getElementById('sr-r3').textContent = formatRp(data.r3);
-        document.getElementById('sr-r2').textContent = formatRp(data.r2);
-        document.getElementById('sr-r1').textContent = formatRp(data.r1);
-        
-        document.getElementById('sr-pivot').textContent = formatRp(data.pivot);
-        
-        document.getElementById('sr-s1').textContent = formatRp(data.s1);
-        document.getElementById('sr-s2').textContent = formatRp(data.s2);
-        document.getElementById('sr-s3').textContent = formatRp(data.s3);
     }
 
     function renderOrderBook(data) {
