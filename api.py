@@ -10,6 +10,10 @@ import numpy as np
 import traceback
 import requests
 import pandas as pd
+import socket
+
+# Prevent hanging connections in third-party libraries (e.g. yfinance)
+socket.setdefaulttimeout(5)
 
 
 
@@ -55,6 +59,103 @@ app.add_middleware(
 frontend_path = os.path.join(os.path.dirname(__file__), "frontend")
 os.makedirs(frontend_path, exist_ok=True)
 
+def fetch_resilient_saham_info(ticker: str) -> dict:
+    """
+    Fetch financial and statistical data directly from Yahoo Finance quoteSummary REST API.
+    Bypasses yfinance library rate limits and session blocks, making it highly resilient for Render.
+    """
+    info = {}
+    try:
+        url = f"https://query2.finance.yahoo.com/v10/finance/quoteSummary/{ticker}?modules=financialData,defaultKeyStatistics,summaryDetail,summaryProfile,quoteType"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+        response = requests.get(url, headers=headers, timeout=5)
+        if response.status_code != 200:
+            url = f"https://query1.finance.yahoo.com/v10/finance/quoteSummary/{ticker}?modules=financialData,defaultKeyStatistics,summaryDetail,summaryProfile,quoteType"
+            response = requests.get(url, headers=headers, timeout=5)
+            
+        if response.status_code == 200:
+            data = response.json()
+            result = data.get('quoteSummary', {}).get('result', [])
+            if result:
+                res = result[0]
+                
+                fin = res.get('financialData', {})
+                stats = res.get('defaultKeyStatistics', {})
+                detail = res.get('summaryDetail', {})
+                profile = res.get('summaryProfile', {})
+                qtype = res.get('quoteType', {})
+                
+                def get_raw(module, key, default=None):
+                    if not module or key not in module:
+                        return default
+                    val_obj = module.get(key)
+                    if isinstance(val_obj, dict) and "raw" in val_obj:
+                        return val_obj["raw"]
+                    return val_obj if val_obj is not None else default
+                
+                info['longName'] = qtype.get('longName') or qtype.get('shortName') or ticker.replace('.JK', '')
+                info['shortName'] = qtype.get('shortName') or ticker.replace('.JK', '')
+                info['symbol'] = qtype.get('symbol') or ticker
+                
+                info['sector'] = profile.get('sector')
+                info['industry'] = profile.get('industry')
+                info['longBusinessSummary'] = profile.get('longBusinessSummary')
+                info['website'] = profile.get('website')
+                
+                info['currentPrice'] = get_raw(fin, 'currentPrice')
+                info['targetHighPrice'] = get_raw(fin, 'targetHighPrice')
+                info['returnOnEquity'] = get_raw(fin, 'returnOnEquity')
+                info['returnOnAssets'] = get_raw(fin, 'returnOnAssets')
+                info['totalRevenue'] = get_raw(fin, 'totalRevenue')
+                info['revenueGrowth'] = get_raw(fin, 'revenueGrowth')
+                info['totalDebt'] = get_raw(fin, 'totalDebt')
+                info['totalCash'] = get_raw(fin, 'totalCash')
+                info['currentRatio'] = get_raw(fin, 'currentRatio')
+                info['quickRatio'] = get_raw(fin, 'quickRatio')
+                info['debtToEquity'] = get_raw(fin, 'debtToEquity')
+                info['freeCashflow'] = get_raw(fin, 'freeCashflow')
+                info['operatingCashflow'] = get_raw(fin, 'operatingCashflow')
+                info['ebitda'] = get_raw(fin, 'ebitda')
+                info['grossMargins'] = get_raw(fin, 'grossMargins')
+                info['ebitdaMargins'] = get_raw(fin, 'ebitdaMargins')
+                info['operatingMargins'] = get_raw(fin, 'operatingMargins')
+                info['profitMargins'] = get_raw(fin, 'profitMargins')
+                
+                info['trailingEps'] = get_raw(stats, 'trailingEps')
+                info['forwardEps'] = get_raw(stats, 'forwardEps')
+                info['bookValue'] = get_raw(stats, 'bookValue')
+                info['priceToBook'] = get_raw(stats, 'priceToBook')
+                info['pegRatio'] = get_raw(stats, 'pegRatio')
+                info['forwardPE'] = get_raw(stats, 'forwardPE')
+                info['enterpriseToRevenue'] = get_raw(stats, 'enterpriseToRevenue')
+                info['enterpriseToEbitda'] = get_raw(stats, 'enterpriseToEbitda')
+                info['netIncomeToCommon'] = get_raw(stats, 'netIncomeToCommon')
+                info['beta'] = get_raw(stats, 'beta')
+                info['earningsGrowth'] = get_raw(stats, 'earningsGrowth')
+                info['earningsQuarterlyGrowth'] = get_raw(stats, 'earningsQuarterlyGrowth')
+                info['revenueQuarterlyGrowth'] = get_raw(stats, 'revenueQuarterlyGrowth')
+                
+                info['previousClose'] = get_raw(detail, 'previousClose')
+                info['regularMarketPrice'] = get_raw(detail, 'regularMarketPrice') or info.get('currentPrice')
+                info['marketCap'] = get_raw(detail, 'marketCap')
+                info['enterpriseValue'] = get_raw(detail, 'enterpriseValue')
+                info['trailingPE'] = get_raw(detail, 'trailingPE')
+                info['priceToSalesTrailing12Months'] = get_raw(detail, 'priceToSalesTrailing12Months')
+                info['dividendYield'] = get_raw(detail, 'dividendYield')
+                info['dividendRate'] = get_raw(detail, 'dividendRate')
+                info['payoutRatio'] = get_raw(detail, 'payoutRatio')
+                info['fiftyTwoWeekHigh'] = get_raw(detail, 'fiftyTwoWeekHigh')
+                info['fiftyTwoWeekLow'] = get_raw(detail, 'fiftyTwoWeekLow')
+                info['averageVolume'] = get_raw(detail, 'averageVolume')
+                
+                print(f"Resilient fallback successfully retrieved and mapped info for {ticker}")
+    except Exception as e:
+        print(f"Error in fetch_resilient_saham_info for {ticker}: {e}")
+        
+    return info
+
 @app.get("/api/analyze/{ticker}")
 def analyze_stock(ticker: str):
     try:
@@ -98,14 +199,27 @@ def analyze_stock(ticker: str):
         if data.empty:
             raise HTTPException(status_code=404, detail="Data saham tidak ditemukan. Pastikan kode saham valid (contoh: BBCA, TLKM).")
         
-        # Single saham.info load to avoid multiple rate-limiting requests on cloud environments
-        try:
-            saham_info = saham.info
-            if saham_info is None or not saham_info:
+        # Single saham.info load with resilient direct REST API fallback to bypass Render IP blocks
+        saham_info = {}
+        is_cloud = os.environ.get("RENDER") == "true" or os.environ.get("PORT") is not None
+        
+        if is_cloud:
+            print("Running in cloud environment. Fetching fundamentals via resilient API fallback first.")
+            saham_info = fetch_resilient_saham_info(ticker)
+            
+        if not saham_info or not saham_info.get('marketCap'):
+            try:
+                saham_info = saham.info
+                if saham_info is None or not isinstance(saham_info, dict):
+                    saham_info = {}
+            except Exception as info_err:
+                print(f"yfinance info fetch failed: {info_err}")
                 saham_info = {}
-        except Exception as info_err:
-            print(f"yfinance info fetch failed: {info_err}")
-            saham_info = {}
+                
+        # Final attempt fallback if standard yfinance returned incomplete details
+        if not saham_info or not saham_info.get('marketCap'):
+            print("yfinance failed or incomplete. Trying resilient API fallback as final attempt.")
+            saham_info = fetch_resilient_saham_info(ticker)
 
         # === Core Analysis (all wrapped for cloud resilience) ===
         try:
