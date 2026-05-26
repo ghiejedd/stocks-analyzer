@@ -100,7 +100,9 @@ def analyze_stock(ticker: str):
         
         # Single saham.info load to avoid multiple rate-limiting requests on cloud environments
         try:
-            saham_info = saham.info or {}
+            saham_info = saham.info
+            if saham_info is None or not saham_info:
+                saham_info = {}
         except Exception as info_err:
             print(f"yfinance info fetch failed: {info_err}")
             saham_info = {}

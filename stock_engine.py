@@ -30,6 +30,8 @@ def format_rupiah(value):
         return f"Rp {value:,.0f}"
 
 def safe_get(info, key, default=None):
+    if info is None or not hasattr(info, 'get'):
+        return default
     val = info.get(key, default)
     if pd.isna(val):
         return default
@@ -38,7 +40,12 @@ def safe_get(info, key, default=None):
 def get_fundamental(saham, kode, info=None):
     try:
         if info is None or not info:
-            info = saham.info
+            try:
+                info = saham.info
+            except Exception:
+                info = {}
+        if info is None:
+            info = {}
         
         per = safe_get(info, 'trailingPE')
         fwd_pe = safe_get(info, 'forwardPE')
